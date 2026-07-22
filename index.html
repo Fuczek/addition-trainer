@@ -408,7 +408,7 @@
                     ? `Add column values plus your carry: <strong>${d1} + ${d2} + ${cin} (carry) = ${sum}</strong>.<br>Enter the single units digit below.`
                     : `Add the column digits: <strong>${d1} + ${d2} = ${sum}</strong>.<br>Enter the single units digit below.`,
                 addInstrCarry: "Great! Now, what is the carry digit for the next column? Enter it in the grey box above the next column. (Enter 0 if there's no carry!)",
-                subInstrReduceZero: "This digit is 0 — it must first borrow a ten from its own left neighbour, then lend 1 to the column on its right. Write its new value in the box above it.",
+                subInstrReducePassThrough: (d, bottom) => `The next digit is <strong>${d}</strong> — even after lending 1, it wouldn't have enough left for its own subtraction later (it needs at least ${bottom}). So it must first borrow a ten from its own left neighbour, then lend 1 to the column on its right. Write its new value in the box above it.`,
                 subInstrReduceLend: (d) => `The next digit to the left is <strong>${d}</strong>. It lends 1 to the column on its right. Write its new value in the box above it.`,
                 subInstrBoost: (d) => `This column borrowed a ten! What is <strong>${d} + 10</strong>? Write the result in the box above.`,
                 correctBoost: 'Correct! This column now has an extra ten.',
@@ -464,7 +464,7 @@
                     ? `Dodaj cyfry kolumny i przeniesienie: <strong>${d1} + ${d2} + ${cin} (przeniesienie) = ${sum}</strong>.<br>Wpisz cyfrę jedności poniżej.`
                     : `Dodaj cyfry kolumny: <strong>${d1} + ${d2} = ${sum}</strong>.<br>Wpisz cyfrę jedności poniżej.`,
                 addInstrCarry: 'Świetnie! Jaka jest cyfra przeniesienia do następnej kolumny? Wpisz ją w szarym polu nad następną kolumną. (Wpisz 0, jeśli nie ma przeniesienia!)',
-                subInstrReduceZero: 'Ta cyfra to 0 — najpierw musi pożyczyć dziesiątkę od swojego lewego sąsiada, a potem pożyczyć 1 kolumnie po prawej. Wpisz jej nową wartość w polu powyżej.',
+                subInstrReducePassThrough: (d, bottom) => `Następna cyfra to <strong>${d}</strong> — nawet po pożyczeniu 1 nie starczyłoby jej do własnego odejmowania (potrzebuje co najmniej ${bottom}). Musi więc najpierw pożyczyć dziesiątkę od swojego lewego sąsiada, a potem pożyczyć 1 kolumnie po prawej. Wpisz jej nową wartość w polu powyżej.`,
                 subInstrReduceLend: (d) => `Następna cyfra po lewej to <strong>${d}</strong>. Pożycza 1 kolumnie po prawej. Wpisz jej nową wartość w polu powyżej.`,
                 subInstrBoost: (d) => `Ta kolumna pożyczyła dziesiątkę! Ile to <strong>${d} + 10</strong>? Wpisz wynik w polu powyżej.`,
                 correctBoost: 'Poprawnie! Ta kolumna ma teraz dodaną dziesiątkę.',
@@ -681,9 +681,9 @@
         function setupSubtractionColumn(p, col) {
             if (p.topDigits[col] < p.bottomDigits[col]) {
                 let j = col + 1;
-                while (p.topDigits[j] === 0) j++;
+                while ((p.topDigits[j] - 1) < p.bottomDigits[j]) j++;
                 p.borrowChain = [];
-                for (let k = col + 1; k <= j; k++) p.borrowChain.push(k);
+                for (let k = j; k >= col + 1; k--) p.borrowChain.push(k);
                 p.chainPos = 0;
                 p.pendingAnswerCol = col;
                 p.currentBorrowed = true;
@@ -967,9 +967,11 @@
 
             if (p.stepState === 'REDUCE') {
                 const col = p.borrowChain[p.chainPos];
+                const isTerminal = p.chainPos === 0;
+                const expected = isTerminal ? (p.topDigits[col] - 1) : (p.topDigits[col] + 9);
                 document.querySelectorAll(`.col-${col}`).forEach(el => el.classList.add('active-column'));
                 const el = document.getElementById(`anno-${col}`);
-                if (el) { el.maxLength = 1; el.disabled = false; el.className = 'anno-input red-anno'; el.focus(); }
+                if (el) { el.maxLength = String(expected).length; el.disabled = false; el.className = 'anno-input red-anno'; el.focus(); }
             } else if (p.stepState === 'BOOST') {
                 document.querySelectorAll(`.col-${p.colIndex}`).forEach(el => el.classList.add('active-column'));
                 const el = document.getElementById(`anno-${p.colIndex}`);
@@ -987,7 +989,8 @@
             if (p.stepState === 'REDUCE') {
                 const col = p.borrowChain[p.chainPos];
                 const d = p.topDigits[col];
-                box.innerHTML = d === 0 ? t('subInstrReduceZero') : t('subInstrReduceLend', d);
+                const isTerminal = p.chainPos === 0;
+                box.innerHTML = isTerminal ? t('subInstrReduceLend', d) : t('subInstrReducePassThrough', d, p.bottomDigits[col]);
             } else if (p.stepState === 'BOOST') {
                 box.innerHTML = t('subInstrBoost', p.topDigits[p.colIndex]);
             } else if (p.currentBorrowed) {
@@ -1005,10 +1008,11 @@
             const feedback = document.getElementById('feedback-message');
 
             if (p.stepState === 'REDUCE' && p.borrowChain[p.chainPos] === col) {
-                if (raw.length < 1) return;
+                const isTerminal = p.chainPos === 0;
+                const expected = isTerminal ? (p.topDigits[col] - 1) : (p.topDigits[col] + 9);
+                const requiredLen = String(expected).length;
+                if (raw.length < requiredLen) return;
                 const digitInput = parseInt(raw, 10);
-                const isLast = p.chainPos === p.borrowChain.length - 1;
-                const expected = isLast ? (p.topDigits[col] - 1) : 9;
                 if (digitInput === expected) {
                     registerCorrect('subtraction');
                     p.topDigits[col] = expected;
