@@ -1,650 +1,1324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Column Addition Trainer</title>
-<style>
-  :root{
-    --bg1:#6c5ce7;
-    --bg2:#00cec9;
-    --card:#ffffff;
-    --ink:#2d3436;
-    --accent:#0984e3;
-    --good:#00b894;
-    --bad:#e17055;
-    --muted:#b2bec3;
-    --col-w: clamp(42px, 11vw, 68px);
-    --col-h: clamp(42px, 11vw, 60px);
-    --font-size: clamp(20px, 5.2vw, 32px);
-  }
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0; padding:0; height:100%;
-    font-family:"Trebuchet MS","Comic Sans MS",system-ui,sans-serif;
-    background:linear-gradient(135deg,var(--bg1),var(--bg2));
-    color:var(--ink);
-  }
-  body{
-    display:flex; align-items:center; justify-content:center;
-    min-height:100vh; padding:16px;
-  }
-  .app{
-    width:100%; max-width:640px;
-  }
-  .card{
-    background:var(--card);
-    border-radius:24px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.25);
-    padding:clamp(18px,4vw,32px);
-    position:relative;
-  }
-  .top-bar{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:12px;
-  }
-  h1{
-    font-size:clamp(22px,5.5vw,32px);
-    margin:0;
-    color:var(--bg1);
-  }
-  .subtitle{
-    color:#636e72;
-    margin:4px 0 18px 0;
-    font-size:clamp(14px,3.5vw,18px);
-  }
-  .lang-btn{
-    border:none; background:var(--accent); color:white;
-    padding:8px 14px; border-radius:999px; font-weight:bold;
-    cursor:pointer; font-size:14px; flex-shrink:0;
-  }
-  .lang-btn:active{transform:scale(0.95);}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Column Math Master</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ec4b6;
+            --error: #e71d36;
+            --background: #f8f9fa;
+            --text: #2b2d42;
+        }
 
-  /* ---- Start Screen ---- */
-  .rounds-label{font-weight:bold; margin-bottom:10px; font-size:clamp(15px,4vw,18px);}
-  .round-chips{
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px;
-  }
-  .round-chip{
-    border:2px solid var(--accent);
-    background:white; color:var(--accent);
-    font-weight:bold; font-size:16px;
-    padding:10px 0; width:48px; border-radius:12px;
-    cursor:pointer;
-  }
-  .round-chip.selected{
-    background:var(--accent); color:white;
-  }
-  .instructions{
-    background:#f1f7ff; border-left:4px solid var(--accent);
-    padding:10px 14px; border-radius:8px;
-    font-size:clamp(13px,3.3vw,15px); margin-bottom:20px;
-    color:#2d3436;
-  }
-  .primary-btn{
-    display:block; width:100%; border:none; border-radius:14px;
-    background:linear-gradient(135deg,var(--bg1),var(--accent));
-    color:white; font-size:clamp(16px,4.2vw,20px); font-weight:bold;
-    padding:14px 0; cursor:pointer;
-    box-shadow:0 8px 18px rgba(9,132,227,0.35);
-  }
-  .primary-btn:active{transform:translateY(2px);}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
 
-  /* ---- Game Screen ---- */
-  .hidden{display:none !important;}
-  .progress-line{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:6px; font-weight:bold; color:var(--accent);
-    font-size:clamp(14px,3.6vw,17px);
-  }
-  .progress-bar-bg{
-    width:100%; height:8px; background:#eee; border-radius:6px; overflow:hidden;
-    margin-bottom:16px;
-  }
-  .progress-bar-fill{
-    height:100%; background:var(--good); width:0%;
-    transition:width 0.3s ease;
-  }
-  .digit-label{
-    text-align:center; font-weight:bold; color:#636e72;
-    margin-bottom:14px; font-size:clamp(14px,3.6vw,16px);
-  }
-  .columns-wrap{
-    overflow-x:auto;
-    padding-bottom:6px;
-  }
-  .row{
-    display:flex; align-items:center; justify-content:flex-end;
-  }
-  .spacer{
-    width:var(--col-w); min-width:var(--col-w);
-    height:var(--col-h);
-    display:flex; align-items:center; justify-content:center;
-    font-size:var(--font-size); font-weight:bold; color:var(--ink);
-  }
-  .cell{
-    width:var(--col-w); min-width:var(--col-w);
-    height:var(--col-h);
-    display:flex; align-items:center; justify-content:center;
-    font-size:var(--font-size); font-weight:bold;
-    color:var(--ink);
-  }
-  .carry-row .cell{
-    height:calc(var(--col-h) * 0.55);
-    font-size:calc(var(--font-size) * 0.55);
-  }
-  .carry-cell{
-    border:2px dashed var(--bad);
-    border-radius:8px;
-    color:var(--bad);
-    background:#fff5f2;
-    text-align:center;
-    font-weight:bold;
-  }
-  .carry-cell.invisible{
-    visibility:hidden;
-    border:none;
-    background:none;
-  }
-  .line-row{
-    height:0; position:relative; margin:4px 0 8px 0;
-  }
-  .full-line{
-    flex:1; border-top:4px solid var(--ink); border-radius:2px;
-  }
-  .answer-cell{
-    border:2px solid var(--muted);
-    border-radius:10px;
-    text-align:center;
-    background:#fbfbfd;
-  }
-  .answer-cell:disabled{
-    background:#f4f4f6;
-    color:#a0a0a5;
-  }
-  .answer-cell.active{
-    border-color:var(--accent);
-    box-shadow:0 0 0 4px rgba(9,132,227,0.15);
-    background:white;
-  }
-  .carry-cell.active{
-    border-color:var(--bad);
-    box-shadow:0 0 0 4px rgba(225,112,85,0.18);
-  }
-  .cell.correct{
-    border-color:var(--good) !important;
-    color:var(--good) !important;
-    background:#eafff5 !important;
-  }
-  .cell.incorrect{
-    animation:shake 0.35s;
-    border-color:var(--bad) !important;
-    background:#ffecec !important;
-  }
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-6px);}
-    40%{transform:translateX(6px);}
-    60%{transform:translateX(-4px);}
-    80%{transform:translateX(4px);}
-  }
-  input.cell{ font-family:inherit; padding:0; }
-  input.cell:focus{ outline:none; }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 520px;
+            text-align: center;
+        }
 
-  .hint{
-    text-align:center; min-height:26px;
-    color:var(--bad); font-weight:bold;
-    font-size:clamp(13px,3.4vw,15px);
-    margin-top:14px;
-  }
+        h1 { color: var(--primary); margin-top: 0; }
 
-  /* ---- Round complete / End screen overlay ---- */
-  .overlay{
-    text-align:center; padding:20px 0;
-  }
-  .overlay h2{
-    font-size:clamp(24px,6vw,32px);
-    color:var(--good); margin-bottom:8px;
-  }
-  .overlay p{
-    color:#636e72; margin-bottom:22px; font-size:clamp(14px,3.8vw,17px);
-  }
-</style>
+        .hidden { display: none !important; }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #357abd; }
+
+        .btn.small {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            margin-bottom: 20px;
+            width: 100px;
+        }
+
+        .op-list {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .op-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #eef0f2;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .op-item:hover { border-color: var(--primary); }
+
+        .op-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .op-name {
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .op-stat {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .warning {
+            color: var(--error);
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        /* Math Board Styling */
+        .math-container {
+            display: inline-grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-gap: 5px;
+            margin: 30px auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .carry-row {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            height: 35px;
+        }
+
+        .carry-input, .answer-input, .q-input, .top-input {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .carry-input {
+            width: 30px;
+            height: 30px;
+            font-size: 1.1rem;
+        }
+
+        .carry-input:focus, .answer-input:focus, .q-input:focus, .top-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #eef5fc;
+        }
+
+        .anno-row {
+            height: 38px;
+        }
+
+        .anno-input {
+            width: 40px;
+            height: 34px;
+            font-size: 1.05rem;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-family: inherit;
+            font-weight: bold;
+            background-color: white;
+        }
+
+        .anno-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #eef5fc;
+        }
+
+        .anno-input:disabled {
+            opacity: 1;
+            background-color: white;
+        }
+
+        .anno-input.red-anno {
+            color: var(--error);
+            border-color: #f3b7bf;
+        }
+
+        .anno-input.green-anno {
+            color: var(--success);
+            border-color: #a9e0da;
+        }
+
+        .top-digit.struck-red {
+            text-decoration: line-through;
+            text-decoration-color: var(--error);
+            text-decoration-thickness: 3px;
+        }
+
+        .top-digit.struck-green {
+            color: var(--success);
+            text-decoration: line-through;
+            text-decoration-color: var(--success);
+            text-decoration-thickness: 3px;
+        }
+
+        .answer-input.locked-answer {
+            color: var(--primary);
+        }
+
+        .active-column, .active-q {
+            background-color: rgba(74, 144, 226, 0.15);
+            border-radius: 5px;
+        }
+
+        .operator {
+            grid-column: 1;
+            text-align: center;
+        }
+
+        .line-row {
+            grid-column: 1 / -1;
+            border-bottom: 4px solid var(--text);
+            height: 0;
+            margin: 5px 0;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .correct { color: var(--success); }
+        .incorrect { color: var(--error); }
+
+        .instructions {
+            background: #eef5fc;
+            padding: 10px;
+            border-left: 5px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        /* Division board */
+        .division-board {
+            display: inline-block;
+            margin: 30px auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        .quotient-row {
+            display: flex;
+        }
+
+        .div-spacer {
+            display: inline-block;
+            width: 44px;
+            flex-shrink: 0;
+        }
+
+        .q-input {
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+        }
+
+        .division-main {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            margin-top: 4px;
+        }
+
+        .divisor {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+        }
+
+        .bracket {
+            display: flex;
+            border-top: 4px solid var(--text);
+            border-left: 4px solid var(--text);
+            padding: 2px 8px 2px 6px;
+        }
+
+        .dividend-digit {
+            width: 40px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .remainder-box {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
-<div class="app">
-  <div class="card">
 
-    <!-- START SCREEN -->
-    <div id="startScreen">
-      <div class="top-bar">
-        <h1 data-i18n="title">Column Addition Trainer</h1>
-        <button class="lang-btn" id="langBtnStart"></button>
-      </div>
-      <p class="subtitle" data-i18n="subtitle">Learn written addition step by step!</p>
+    <div id="setup-screen" class="card">
+        <div class="topbar">
+            <span></span>
+            <button class="btn small" id="lang-toggle" onclick="toggleLang()">PL</button>
+        </div>
+        <h1 id="menu-title">Column Math Master</h1>
+        <p id="menu-tagline">Learn written math, one step at a time!</p>
 
-      <div class="rounds-label" data-i18n="chooseRoundsLabel">How many rounds?</div>
-      <div class="round-chips" id="roundChips"></div>
+        <p id="choose-ops-label" style="text-align:left; font-weight:bold; margin-bottom:5px;">Choose what to practice:</p>
+        <div class="op-list" id="op-list"></div>
+        <p class="warning hidden" id="select-warning"></p>
 
-      <div class="instructions" data-i18n="instructions">
-        Fill in one box at a time, starting from the ones column on the right.
-      </div>
-
-      <button class="primary-btn" id="startBtn" data-i18n="startBtn">Start</button>
+        <label id="rounds-label" for="round-select"><strong>Number of rounds:</strong></label><br><br>
+        <select id="round-select">
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10" selected>10</option>
+        </select>
+        <br>
+        <button class="btn" id="start-btn" onclick="startGame()">Start Game</button>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="gameScreen" class="hidden">
-      <div class="top-bar">
-        <h1 data-i18n="title" style="font-size:clamp(18px,4.5vw,24px);">Column Addition Trainer</h1>
-        <button class="lang-btn" id="langBtnGame"></button>
-      </div>
-      <div class="progress-line">
-        <span id="progressLabel"></span>
-      </div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <div class="digit-label" id="digitLabel"></div>
+    <div id="game-screen" class="card hidden">
+        <div class="topbar">
+            <button class="btn small" onclick="backToMenu()" id="menu-btn-game">Menu</button>
+            <button class="btn small" id="lang-toggle-game" onclick="toggleLang()">PL</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-weight: bold;">
+            <span id="round-tracker">Round 1 of 5</span>
+            <span id="score-tracker">Score: 0</span>
+        </div>
 
-      <div class="columns-wrap">
-        <div class="row carry-row" id="carryRow"></div>
-        <div class="row num-row" id="num1Row"></div>
-        <div class="row num-row" id="num2Row"></div>
-        <div class="row line-row"><div class="spacer"></div><div class="full-line"></div></div>
-        <div class="row answer-row" id="answerRow"></div>
-      </div>
+        <div class="instructions" id="instruction-box">
+            Look at the highlighted column and solve it!
+        </div>
 
-      <div class="hint" id="hintLine"></div>
+        <div class="math-container" id="math-grid"></div>
+
+        <div id="feedback-message" class="feedback"></div>
+        <button id="next-btn" class="btn hidden" onclick="nextRound()">Next Round</button>
     </div>
 
-    <!-- ROUND COMPLETE SCREEN -->
-    <div id="roundCompleteScreen" class="hidden overlay">
-      <h2 data-i18n="roundCompleteTitle">🎉 Round complete!</h2>
-      <p id="roundCompleteSub"></p>
-      <button class="primary-btn" id="nextRoundBtn"></button>
+    <div id="end-screen" class="card hidden">
+        <div class="topbar">
+            <span></span>
+            <button class="btn small" id="lang-toggle-end" onclick="toggleLang()">PL</button>
+        </div>
+        <h1 id="end-title">Congratulations! 🎉</h1>
+        <p id="end-message">You have finished all the rounds!</p>
+        <h2 id="final-score">Final Score: 0</h2>
+        <button class="btn" id="play-again-btn" onclick="backToMenu()">Play Again</button>
     </div>
 
-    <!-- END SCREEN -->
-    <div id="endScreen" class="hidden overlay">
-      <h2 data-i18n="finalTitle">🏆 Well done!</h2>
-      <p id="finalRoundsLine"></p>
-      <p id="finalMistakesLine"></p>
-      <button class="primary-btn" id="playAgainBtn" data-i18n="playAgainBtn">Play again</button>
-    </div>
+    <script>
+        const translations = {
+            en: {
+                appTitle: 'Column Math Master',
+                menuTagline: 'Learn written math, one step at a time!',
+                chooseOperations: 'Choose what to practice:',
+                operationAddition: 'Addition',
+                operationSubtraction: 'Subtraction',
+                operationMultiplication: 'Multiplication',
+                operationDivision: 'Division',
+                correctAnswersLabel: 'Correct answers:',
+                chooseRounds: 'Number of rounds:',
+                startGame: 'Start Game',
+                selectAtLeastOne: 'Please choose at least one operation to practice.',
+                menu: 'Menu',
+                round: (c, t) => `Round ${c} of ${t}`,
+                score: (s) => `Score: ${s}`,
+                nextRound: 'Next Round',
+                playAgain: 'Play Again',
+                congrats: 'Congratulations! 🎉',
+                finishedAll: 'You have finished all the rounds. Great job practicing written math!',
+                finalScore: (s) => `Final Score: ${s}`,
+                correctDigit: 'Correct digit!',
+                correctCarry: 'Correct carry!',
+                correctBorrow: 'Correct borrow!',
+                correctQuotient: 'Correct quotient digit!',
+                correctRemainder: 'Correct remainder!',
+                incorrectDigitTry: 'Oops, try that column again.',
+                incorrectCarry: 'Incorrect carry value. Look at the tens place of your column sum!',
+                incorrectBorrow: 'Incorrect borrow value. Did you need to borrow from the next column? (0 or 1)',
+                incorrectQuotient: 'Incorrect quotient digit. How many whole times does the divisor fit into this value?',
+                incorrectRemainder: 'Incorrect remainder. Subtract (divisor × quotient digit) from the current value.',
+                remainderLabel: 'Remainder:',
+                clickNext: "Click 'Next Round' to proceed!",
+                addInstrAnswer: (d1, d2, cin, sum) => cin > 0
+                    ? `Add column values plus your carry: <strong>${d1} + ${d2} + ${cin} (carry) = ${sum}</strong>.<br>Enter the single units digit below.`
+                    : `Add the column digits: <strong>${d1} + ${d2} = ${sum}</strong>.<br>Enter the single units digit below.`,
+                addInstrCarry: "Great! Now, what is the carry digit for the next column? Enter it in the grey box above the next column. (Enter 0 if there's no carry!)",
+                subInstrReduceZero: "This digit is 0 — it must first borrow a ten from its own left neighbour, then lend 1 to the column on its right. Write its new value in the box above it.",
+                subInstrReduceLend: (d) => `The next digit to the left is <strong>${d}</strong>. It lends 1 to the column on its right. Write its new value in the box above it.`,
+                subInstrBoost: (d) => `This column borrowed a ten! What is <strong>${d} + 10</strong>? Write the result in the box above.`,
+                correctBoost: 'Correct! This column now has an extra ten.',
+                incorrectBoost: "Not quite — this column's digit gained a whole ten. Add 10 to the original digit.",
+                subInstrAnswerBoosted: (boosted, bottom) => `Now subtract: <strong>${boosted} − ${bottom}</strong>.<br>Enter the digit below.`,
+                subInstrAnswerPlain: (top, bottom) => `Subtract the column digits: <strong>${top} − ${bottom}</strong>.<br>Enter the digit below.`,
+                mulInstrAnswer: (d1, d2, cin, prod) => cin > 0
+                    ? `Multiply and add your carry: <strong>${d1} × ${d2} + ${cin} (carry) = ${prod}</strong>.<br>Enter the single units digit below.`
+                    : `Multiply the column digit: <strong>${d1} × ${d2} = ${prod}</strong>.<br>Enter the single units digit below.`,
+                mulInstrCarry: "Great! What is the carry digit for the next column? Enter it above the next column. (Enter 0 if there's no carry!)",
+                divInstrQuotient: (value, divisor) => `Bring down the digit: current value is <strong>${value}</strong>. How many whole times does ${divisor} fit into ${value}? Enter the digit above.`,
+                divInstrRemainder: (value, divisor, q, product) => `Multiply and subtract: <strong>${divisor} × ${q} = ${product}</strong>, so <strong>${value} − ${product} = ${value - product}</strong>. Enter the remainder below.`,
+                problemSolvedAdd: (n1, n2, ans) => `Fantastic! ${n1} + ${n2} = ${ans}. Problem solved!`,
+                problemSolvedSub: (n1, n2, ans) => `Fantastic! ${n1} − ${n2} = ${ans}. Problem solved!`,
+                problemSolvedMul: (n1, n2, ans) => `Fantastic! ${n1} × ${n2} = ${ans}. Problem solved!`,
+                problemSolvedDiv: (n1, n2, q, r) => r > 0
+                    ? `Fantastic! ${n1} ÷ ${n2} = ${q} remainder ${r}. Problem solved!`
+                    : `Fantastic! ${n1} ÷ ${n2} = ${q}. Problem solved!`,
+            },
+            pl: {
+                appTitle: 'Mistrz Matematyki Pisemnej',
+                menuTagline: 'Ucz się matematyki pisemnej krok po kroku!',
+                chooseOperations: 'Wybierz, co chcesz ćwiczyć:',
+                operationAddition: 'Dodawanie',
+                operationSubtraction: 'Odejmowanie',
+                operationMultiplication: 'Mnożenie',
+                operationDivision: 'Dzielenie',
+                correctAnswersLabel: 'Poprawne odpowiedzi:',
+                chooseRounds: 'Liczba rund:',
+                startGame: 'Rozpocznij grę',
+                selectAtLeastOne: 'Wybierz przynajmniej jedno działanie do ćwiczenia.',
+                menu: 'Menu',
+                round: (c, t) => `Runda ${c} z ${t}`,
+                score: (s) => `Wynik: ${s}`,
+                nextRound: 'Następna runda',
+                playAgain: 'Zagraj ponownie',
+                congrats: 'Gratulacje! 🎉',
+                finishedAll: 'Ukończyłeś wszystkie rundy. Świetnie ćwiczysz matematykę pisemną!',
+                finalScore: (s) => `Wynik końcowy: ${s}`,
+                correctDigit: 'Poprawna cyfra!',
+                correctCarry: 'Poprawne przeniesienie!',
+                correctBorrow: 'Poprawna pożyczka!',
+                correctQuotient: 'Poprawna cyfra ilorazu!',
+                correctRemainder: 'Poprawna reszta!',
+                incorrectDigitTry: 'Niestety, spróbuj ponownie w tej kolumnie.',
+                incorrectCarry: 'Niepoprawne przeniesienie. Sprawdź cyfrę dziesiątek w sumie tej kolumny!',
+                incorrectBorrow: 'Niepoprawna pożyczka. Czy trzeba było pożyczyć z następnej kolumny? (0 lub 1)',
+                incorrectQuotient: 'Niepoprawna cyfra ilorazu. Ile pełnych razy dzielnik mieści się w tej liczbie?',
+                incorrectRemainder: 'Niepoprawna reszta. Odejmij (dzielnik × cyfra ilorazu) od bieżącej wartości.',
+                remainderLabel: 'Reszta:',
+                clickNext: "Kliknij 'Następna runda', aby kontynuować!",
+                addInstrAnswer: (d1, d2, cin, sum) => cin > 0
+                    ? `Dodaj cyfry kolumny i przeniesienie: <strong>${d1} + ${d2} + ${cin} (przeniesienie) = ${sum}</strong>.<br>Wpisz cyfrę jedności poniżej.`
+                    : `Dodaj cyfry kolumny: <strong>${d1} + ${d2} = ${sum}</strong>.<br>Wpisz cyfrę jedności poniżej.`,
+                addInstrCarry: 'Świetnie! Jaka jest cyfra przeniesienia do następnej kolumny? Wpisz ją w szarym polu nad następną kolumną. (Wpisz 0, jeśli nie ma przeniesienia!)',
+                subInstrReduceZero: 'Ta cyfra to 0 — najpierw musi pożyczyć dziesiątkę od swojego lewego sąsiada, a potem pożyczyć 1 kolumnie po prawej. Wpisz jej nową wartość w polu powyżej.',
+                subInstrReduceLend: (d) => `Następna cyfra po lewej to <strong>${d}</strong>. Pożycza 1 kolumnie po prawej. Wpisz jej nową wartość w polu powyżej.`,
+                subInstrBoost: (d) => `Ta kolumna pożyczyła dziesiątkę! Ile to <strong>${d} + 10</strong>? Wpisz wynik w polu powyżej.`,
+                correctBoost: 'Poprawnie! Ta kolumna ma teraz dodaną dziesiątkę.',
+                incorrectBoost: 'Niezupełnie — cyfra tej kolumny zyskała całą dziesiątkę. Dodaj 10 do oryginalnej cyfry.',
+                subInstrAnswerBoosted: (boosted, bottom) => `Teraz odejmij: <strong>${boosted} − ${bottom}</strong>.<br>Wpisz cyfrę poniżej.`,
+                subInstrAnswerPlain: (top, bottom) => `Odejmij cyfry kolumny: <strong>${top} − ${bottom}</strong>.<br>Wpisz cyfrę poniżej.`,
+                mulInstrAnswer: (d1, d2, cin, prod) => cin > 0
+                    ? `Pomnóż i dodaj przeniesienie: <strong>${d1} × ${d2} + ${cin} (przeniesienie) = ${prod}</strong>.<br>Wpisz cyfrę jedności poniżej.`
+                    : `Pomnóż cyfrę kolumny: <strong>${d1} × ${d2} = ${prod}</strong>.<br>Wpisz cyfrę jedności poniżej.`,
+                mulInstrCarry: 'Świetnie! Jaka jest cyfra przeniesienia do następnej kolumny? Wpisz ją nad następną kolumną. (Wpisz 0, jeśli nie ma przeniesienia!)',
+                divInstrQuotient: (value, divisor) => `Znieś cyfrę: bieżąca wartość to <strong>${value}</strong>. Ile pełnych razy ${divisor} mieści się w ${value}? Wpisz cyfrę powyżej.`,
+                divInstrRemainder: (value, divisor, q, product) => `Pomnóż i odejmij: <strong>${divisor} × ${q} = ${product}</strong>, więc <strong>${value} − ${product} = ${value - product}</strong>. Wpisz resztę poniżej.`,
+                problemSolvedAdd: (n1, n2, ans) => `Wspaniale! ${n1} + ${n2} = ${ans}. Zadanie rozwiązane!`,
+                problemSolvedSub: (n1, n2, ans) => `Wspaniale! ${n1} − ${n2} = ${ans}. Zadanie rozwiązane!`,
+                problemSolvedMul: (n1, n2, ans) => `Wspaniale! ${n1} × ${n2} = ${ans}. Zadanie rozwiązane!`,
+                problemSolvedDiv: (n1, n2, q, r) => r > 0
+                    ? `Wspaniale! ${n1} ÷ ${n2} = ${q} reszty ${r}. Zadanie rozwiązane!`
+                    : `Wspaniale! ${n1} ÷ ${n2} = ${q}. Zadanie rozwiązane!`,
+            }
+        };
 
-  </div>
-</div>
+        const OPS = ['addition', 'subtraction', 'multiplication', 'division'];
+        const STATS_KEY = 'columnMathStats';
+        const LANG_KEY = 'columnMathLang';
 
-<script>
-/* ---------------- i18n ---------------- */
-const STRINGS = {
-  en: {
-    title: "Column Addition Trainer",
-    subtitle: "Learn written addition step by step!",
-    chooseRoundsLabel: "How many rounds?",
-    startBtn: "Start",
-    instructions: "Fill in one box at a time, starting from the ones column on the right. If a column adds up to 10 or more, write the small carry number above the next column before continuing.",
-    roundProgress: "Round {current} of {total}",
-    digitsLabel: "{n}-digit numbers",
-    hintCarryActive: "Write the carry above the next column ⬆",
-    hintAnswerActive: "Write the result digit for this column",
-    roundCompleteTitle: "🎉 Round complete!",
-    roundCompleteSub: "No mistakes this round \u2014 great job!",
-    roundCompleteSubMistakes: "You made {mistakes} mistake(s) this round.",
-    nextRoundBtn: "Next round",
-    finishBtn: "See results",
-    finalTitle: "🏆 Well done!",
-    finalRoundsLine: "You completed {completed} of {total} rounds.",
-    finalMistakesLine: "Total mistakes: {mistakes}",
-    playAgainBtn: "Play again",
-    langBtn: "PL"
-  },
-  pl: {
-    title: "Trener dodawania pisemnego",
-    subtitle: "Naucz się dodawania pisemnego krok po kroku!",
-    chooseRoundsLabel: "Ile rund?",
-    startBtn: "Start",
-    instructions: "Uzupełniaj po jednym polu, zaczynając od kolumny jedności po prawej stronie. Jeśli suma w kolumnie wynosi 10 lub więcej, zapisz małe przeniesienie nad następną kolumną, zanim przejdziesz dalej.",
-    roundProgress: "Runda {current} z {total}",
-    digitsLabel: "Liczby {n}-cyfrowe",
-    hintCarryActive: "Zapisz przeniesienie nad następną kolumną ⬆",
-    hintAnswerActive: "Zapisz cyfrę wyniku dla tej kolumny",
-    roundCompleteTitle: "🎉 Runda ukończona!",
-    roundCompleteSub: "Brak błędów w tej rundzie \u2014 świetna robota!",
-    roundCompleteSubMistakes: "Popełniono {mistakes} błąd(ów) w tej rundzie.",
-    nextRoundBtn: "Następna runda",
-    finishBtn: "Zobacz wynik",
-    finalTitle: "🏆 Świetna robota!",
-    finalRoundsLine: "Ukończono {completed} z {total} rund.",
-    finalMistakesLine: "Liczba błędów: {mistakes}",
-    playAgainBtn: "Zagraj ponownie",
-    langBtn: "EN"
-  }
-};
-let lang = 'en';
-function t(key, vars){
-  let str = (STRINGS[lang] && STRINGS[lang][key]) || key;
-  if(vars){
-    Object.keys(vars).forEach(k=>{ str = str.replace('{'+k+'}', vars[k]); });
-  }
-  return str;
-}
-function applyStaticI18n(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    el.textContent = t(el.dataset.i18n);
-  });
-  document.getElementById('langBtnStart').textContent = t('langBtn');
-  document.getElementById('langBtnGame').textContent = t('langBtn');
-  refreshDynamicTexts();
-}
-function toggleLang(){
-  lang = (lang === 'en') ? 'pl' : 'en';
-  applyStaticI18n();
-}
+        let lang = localStorage.getItem(LANG_KEY) || 'en';
+        let stats = loadStats();
+        let selectedTypes = [...OPS];
 
-/* ---------------- State ---------------- */
-let totalRounds = 7;
-let roundPlan = [];
-let currentRoundIndex = 0;
-let currentProblem = null;
-let steps = [];
-let currentStepIndex = 0;
-let mistakesThisRound = 0;
-let totalMistakes = 0;
-let roundsCompleted = 0;
-let currentNumColumns = 0;
+        let totalRounds = 5;
+        let currentRound = 1;
+        let score = 0;
+        let problem = null;
 
-/* ---------------- Helpers: math ---------------- */
-function randInt(min, max){
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function randDigits(digitCount){
-  const arr = [];
-  for(let p = 0; p < digitCount; p++){
-    arr[p] = (p === digitCount - 1) ? randInt(1, 9) : randInt(0, 9);
-  }
-  return arr;
-}
-function simulateHasCarry(d1, d2, digitCount){
-  let carry = 0;
-  for(let p = 0; p < digitCount; p++){
-    const sum = d1[p] + d2[p] + carry;
-    if(sum >= 10) return true;
-    carry = 0;
-  }
-  return false;
-}
-function generateNumbers(digitCount, requireCarry){
-  for(let attempt = 0; attempt < 300; attempt++){
-    const d1 = randDigits(digitCount);
-    const d2 = randDigits(digitCount);
-    if(simulateHasCarry(d1, d2, digitCount) === requireCarry){
-      return { d1, d2 };
-    }
-  }
-  return { d1: randDigits(digitCount), d2: randDigits(digitCount) };
-}
-function buildSteps(d1, d2, digitCount){
-  const result = [];
-  let carry = 0;
-  let place = 0;
-  const maxPlace = digitCount - 1;
-  while(place <= maxPlace || carry > 0){
-    const a = place <= maxPlace ? d1[place] : 0;
-    const b = place <= maxPlace ? d2[place] : 0;
-    const sum = a + b + carry;
-    const resultDigit = sum % 10;
-    const newCarry = Math.floor(sum / 10);
-    result.push({ type: 'answer', place, value: resultDigit });
-    if(newCarry > 0){
-      result.push({ type: 'carry', place: place + 1, value: newCarry });
-    }
-    carry = newCarry;
-    place++;
-  }
-  return result;
-}
-function buildRoundPlan(n){
-  const plan = [];
-  for(let i = 0; i < n; i++){
-    const fraction = n > 1 ? i / (n - 1) : 0;
-    const digitCount = 2 + Math.round(fraction * 2); // 2..4
-    const requireCarry = Math.random() < 0.5;
-    plan.push({ digitCount, requireCarry });
-  }
-  return plan;
-}
+        function loadStats() {
+            const base = { addition: 0, subtraction: 0, multiplication: 0, division: 0 };
+            try {
+                const raw = JSON.parse(localStorage.getItem(STATS_KEY));
+                if (raw) return Object.assign(base, raw);
+            } catch (e) { /* ignore corrupt cache */ }
+            return base;
+        }
 
-/* ---------------- Start Screen ---------------- */
-const roundChipsEl = document.getElementById('roundChips');
-function renderRoundChips(){
-  roundChipsEl.innerHTML = '';
-  for(let n = 5; n <= 10; n++){
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'round-chip' + (n === totalRounds ? ' selected' : '');
-    btn.textContent = n;
-    btn.addEventListener('click', () => {
-      totalRounds = n;
-      renderRoundChips();
-    });
-    roundChipsEl.appendChild(btn);
-  }
-}
-renderRoundChips();
+        function saveStats() {
+            localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+        }
 
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('langBtnStart').addEventListener('click', toggleLang);
-document.getElementById('langBtnGame').addEventListener('click', toggleLang);
-document.getElementById('playAgainBtn').addEventListener('click', () => {
-  show('startScreen');
-});
+        function t(key, ...args) {
+            const entry = translations[lang][key];
+            return typeof entry === 'function' ? entry(...args) : entry;
+        }
 
-function startGame(){
-  roundPlan = buildRoundPlan(totalRounds);
-  currentRoundIndex = 0;
-  totalMistakes = 0;
-  roundsCompleted = 0;
-  show('gameScreen');
-  startRound();
-}
+        function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-/* ---------------- Screen switching ---------------- */
-function show(id){
-  ['startScreen','gameScreen','roundCompleteScreen','endScreen'].forEach(s=>{
-    document.getElementById(s).classList.toggle('hidden', s !== id);
-  });
-}
+        function toggleLang() {
+            lang = lang === 'en' ? 'pl' : 'en';
+            localStorage.setItem(LANG_KEY, lang);
+            refreshVisibleScreenText();
+        }
 
-/* ---------------- Game Round ---------------- */
-function startRound(){
-  const plan = roundPlan[currentRoundIndex];
-  currentProblem = generateNumbers(plan.digitCount, plan.requireCarry);
-  currentProblem.digitCount = plan.digitCount;
-  steps = buildSteps(currentProblem.d1, currentProblem.d2, plan.digitCount);
-  currentStepIndex = 0;
-  mistakesThisRound = 0;
-  renderProblem();
-  updateProgress();
-  activateStep(0);
-}
+        function refreshVisibleScreenText() {
+            document.documentElement.lang = lang;
+            if (!document.getElementById('setup-screen').classList.contains('hidden')) {
+                renderMenu();
+            } else if (!document.getElementById('game-screen').classList.contains('hidden')) {
+                document.getElementById('lang-toggle-game').textContent = lang === 'en' ? 'PL' : 'EN';
+                document.getElementById('menu-btn-game').textContent = t('menu');
+                document.getElementById('next-btn').textContent = t('nextRound');
+                updateRoundScoreText();
+                updateInstruction();
+            } else {
+                renderEndScreen();
+            }
+        }
 
-function updateProgress(){
-  document.getElementById('progressLabel').textContent =
-    t('roundProgress', { current: currentRoundIndex + 1, total: totalRounds });
-  document.getElementById('progressFill').style.width =
-    Math.round((currentRoundIndex / totalRounds) * 100) + '%';
-  document.getElementById('digitLabel').textContent =
-    t('digitsLabel', { n: currentProblem.digitCount });
-}
-function refreshDynamicTexts(){
-  if(currentProblem){
-    updateProgress();
-    updateHint();
-  }
-}
+        function renderMenu() {
+            document.title = t('appTitle');
+            document.documentElement.lang = lang;
+            document.getElementById('menu-title').textContent = t('appTitle');
+            document.getElementById('menu-tagline').textContent = t('menuTagline');
+            document.getElementById('choose-ops-label').textContent = t('chooseOperations');
+            document.getElementById('rounds-label').innerHTML = `<strong>${t('chooseRounds')}</strong>`;
+            document.getElementById('start-btn').textContent = t('startGame');
+            document.getElementById('lang-toggle').textContent = lang === 'en' ? 'PL' : 'EN';
+            document.getElementById('select-warning').textContent = t('selectAtLeastOne');
 
-function makeCell(text, cls){
-  const div = document.createElement('div');
-  div.className = cls;
-  div.textContent = text;
-  return div;
-}
-function makeSpacer(text){
-  const div = document.createElement('div');
-  div.className = 'spacer';
-  div.textContent = text || '';
-  return div;
-}
+            const list = document.getElementById('op-list');
+            list.innerHTML = '';
+            OPS.forEach(op => {
+                const label = document.createElement('label');
+                label.className = 'op-item';
 
-function renderProblem(){
-  const { d1, d2, digitCount } = currentProblem;
-  const numColumns = Math.max(...steps.map(s => s.place)) + 1;
-  currentNumColumns = numColumns;
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = op;
+                cb.checked = selectedTypes.includes(op);
+                cb.addEventListener('change', onOpToggle);
 
-  const carryRow = document.getElementById('carryRow');
-  const num1Row = document.getElementById('num1Row');
-  const num2Row = document.getElementById('num2Row');
-  const answerRow = document.getElementById('answerRow');
-  carryRow.innerHTML = '';
-  num1Row.innerHTML = '';
-  num2Row.innerHTML = '';
-  answerRow.innerHTML = '';
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'op-name';
+                nameSpan.textContent = t('operation' + capitalize(op));
 
-  carryRow.appendChild(makeSpacer(''));
-  num1Row.appendChild(makeSpacer(''));
-  num2Row.appendChild(makeSpacer('+'));
-  answerRow.appendChild(makeSpacer(''));
+                const statSpan = document.createElement('span');
+                statSpan.className = 'op-stat';
+                statSpan.textContent = `${t('correctAnswersLabel')} ${stats[op] || 0}`;
 
-  const carryPlaces = new Set(steps.filter(s => s.type === 'carry').map(s => s.place));
+                label.appendChild(cb);
+                label.appendChild(nameSpan);
+                label.appendChild(statSpan);
+                list.appendChild(label);
+            });
+        }
 
-  for(let place = numColumns - 1; place >= 0; place--){
-    // carry row
-    if(carryPlaces.has(place)){
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.setAttribute('inputmode', 'numeric');
-      inp.setAttribute('pattern', '[0-9]*');
-      inp.maxLength = 1;
-      inp.className = 'cell carry-cell';
-      inp.dataset.type = 'carry';
-      inp.dataset.place = place;
-      inp.disabled = true;
-      inp.addEventListener('input', onCellInput);
-      carryRow.appendChild(inp);
-    } else {
-      carryRow.appendChild(makeCell('', 'cell carry-cell invisible'));
-    }
-    // num1 / num2
-    const v1 = place < digitCount ? String(d1[place]) : '';
-    const v2 = place < digitCount ? String(d2[place]) : '';
-    num1Row.appendChild(makeCell(v1, 'cell num-cell'));
-    num2Row.appendChild(makeCell(v2, 'cell num-cell'));
-    // answer row
-    const ainp = document.createElement('input');
-    ainp.type = 'text';
-    ainp.setAttribute('inputmode', 'numeric');
-    ainp.setAttribute('pattern', '[0-9]*');
-    ainp.maxLength = 1;
-    ainp.className = 'cell answer-cell';
-    ainp.dataset.type = 'answer';
-    ainp.dataset.place = place;
-    ainp.disabled = true;
-    ainp.addEventListener('input', onCellInput);
-    answerRow.appendChild(ainp);
-  }
-}
+        function onOpToggle(e) {
+            const op = e.target.value;
+            if (e.target.checked) {
+                if (!selectedTypes.includes(op)) selectedTypes.push(op);
+            } else {
+                selectedTypes = selectedTypes.filter(o => o !== op);
+            }
+            document.getElementById('select-warning').classList.add('hidden');
+        }
 
-function findStepEl(step){
-  return document.querySelector(`.cell[data-type="${step.type}"][data-place="${step.place}"]`);
-}
+        function startGame() {
+            if (selectedTypes.length === 0) {
+                document.getElementById('select-warning').classList.remove('hidden');
+                return;
+            }
+            totalRounds = parseInt(document.getElementById('round-select').value, 10);
+            currentRound = 1;
+            score = 0;
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('menu-btn-game').textContent = t('menu');
+            generateRound();
+        }
 
-function activateStep(idx){
-  document.querySelectorAll('.cell.active').forEach(el => el.classList.remove('active'));
-  const step = steps[idx];
-  const el = findStepEl(step);
-  if(el){
-    el.disabled = false;
-    el.classList.add('active');
-    el.value = '';
-    setTimeout(() => el.focus(), 50);
-  }
-  updateHint();
-}
+        function backToMenu() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            renderMenu();
+        }
 
-function updateHint(){
-  const hintEl = document.getElementById('hintLine');
-  if(!steps.length || currentStepIndex >= steps.length){
-    hintEl.textContent = '';
-    return;
-  }
-  const step = steps[currentStepIndex];
-  hintEl.textContent = step.type === 'carry' ? t('hintCarryActive') : t('hintAnswerActive');
-}
+        /* ---------- Round generation ---------- */
 
-function onCellInput(e){
-  const el = e.target;
-  const val = el.value.replace(/[^0-9]/g, '');
-  el.value = val;
-  if(val.length !== 1) return;
+        function digitTier(round, total) {
+            if (round > total * 0.7) return { min: 3, max: 4 };
+            if (round > total * 0.35) return { min: 2, max: 3 };
+            return { min: 2, max: 2 };
+        }
 
-  const step = steps[currentStepIndex];
-  const digit = parseInt(val, 10);
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-  if(digit === step.value){
-    el.classList.remove('incorrect');
-    el.classList.add('correct');
-    el.classList.remove('active');
-    el.disabled = true;
-    currentStepIndex++;
-    if(currentStepIndex < steps.length){
-      activateStep(currentStepIndex);
-    } else {
-      finishRound();
-    }
-  } else {
-    el.classList.add('incorrect');
-    mistakesThisRound++;
-    totalMistakes++;
-    setTimeout(() => {
-      el.value = '';
-      el.classList.remove('incorrect');
-      el.focus();
-    }, 450);
-  }
-}
+        function genNumber(tier) {
+            const rangeMin = Math.pow(10, tier.min - 1);
+            const rangeMax = Math.pow(10, tier.max) - 1;
+            return randInt(rangeMin, rangeMax);
+        }
 
-function finishRound(){
-  roundsCompleted++;
-  const sub = document.getElementById('roundCompleteSub');
-  sub.textContent = mistakesThisRound === 0
-    ? t('roundCompleteSub')
-    : t('roundCompleteSubMistakes', { mistakes: mistakesThisRound });
+        function digitsReversed(n) { return n.toString().split('').reverse(); }
 
-  const isLast = currentRoundIndex >= totalRounds - 1;
-  const nextBtn = document.getElementById('nextRoundBtn');
-  nextBtn.textContent = isLast ? t('finishBtn') : t('nextRoundBtn');
-  nextBtn.onclick = () => {
-    currentRoundIndex++;
-    if(currentRoundIndex < totalRounds){
-      show('gameScreen');
-      startRound();
-    } else {
-      endGame();
-    }
-  };
-  show('roundCompleteScreen');
-}
+        function getDigitAtColumn(n, col) {
+            const s = digitsReversed(n);
+            return col < s.length ? parseInt(s[col], 10) : 0;
+        }
 
-function endGame(){
-  document.getElementById('finalRoundsLine').textContent =
-    t('finalRoundsLine', { completed: roundsCompleted, total: totalRounds });
-  document.getElementById('finalMistakesLine').textContent =
-    t('finalMistakesLine', { mistakes: totalMistakes });
-  show('endScreen');
-}
+        function numLen(n) { return n.toString().length; }
 
-/* ---------------- Init ---------------- */
-applyStaticI18n();
-</script>
+        function requiresCarryAdd(n1, n2) {
+            const s1 = digitsReversed(n1), s2 = digitsReversed(n2);
+            for (let i = 0; i < Math.min(s1.length, s2.length); i++) {
+                if (parseInt(s1[i], 10) + parseInt(s2[i], 10) >= 10) return true;
+            }
+            return false;
+        }
+
+        function generateProblem(type, round, total) {
+            const tier = digitTier(round, total);
+            if (type === 'addition') return genAddition(tier);
+            if (type === 'subtraction') return genSubtraction(tier);
+            if (type === 'multiplication') return genMultiplication(tier);
+            return genDivision(tier);
+        }
+
+        function genAddition(tier) {
+            let num1 = genNumber(tier);
+            let num2 = genNumber(tier);
+            if (!requiresCarryAdd(num1, num2)) { num1 += 5; }
+            return { type: 'addition', num1, num2, maxDigits: 5, colIndex: 0, stepState: 'ANSWER' };
+        }
+
+        function genSubtraction(tier) {
+            let num1 = genNumber(tier);
+            let num2 = genNumber(tier);
+            if (num1 < num2) { const tmp = num1; num1 = num2; num2 = tmp; }
+            const colCount = numLen(num1);
+            const originalTop = [];
+            const bottomDigits = [];
+            for (let col = 0; col < colCount; col++) {
+                originalTop.push(getDigitAtColumn(num1, col));
+                bottomDigits.push(getDigitAtColumn(num2, col));
+            }
+            const p = {
+                type: 'subtraction', num1, num2, colCount,
+                originalTop, topDigits: [...originalTop], bottomDigits,
+                colIndex: 0, stepState: 'ANSWER',
+                borrowChain: [], chainPos: 0, pendingAnswerCol: null, currentBorrowed: false
+            };
+            setupSubtractionColumn(p, 0);
+            return p;
+        }
+
+        function setupSubtractionColumn(p, col) {
+            if (p.topDigits[col] < p.bottomDigits[col]) {
+                let j = col + 1;
+                while (p.topDigits[j] === 0) j++;
+                p.borrowChain = [];
+                for (let k = col + 1; k <= j; k++) p.borrowChain.push(k);
+                p.chainPos = 0;
+                p.pendingAnswerCol = col;
+                p.currentBorrowed = true;
+                p.colIndex = col;
+                p.stepState = 'REDUCE';
+            } else {
+                p.currentBorrowed = false;
+                p.colIndex = col;
+                p.stepState = 'ANSWER';
+            }
+        }
+
+        function genMultiplication(tier) {
+            const num1 = genNumber(tier);
+            const multiplier = randInt(2, 9);
+            return { type: 'multiplication', num1, multiplier, maxDigits: 5, colIndex: 0, stepState: 'ANSWER' };
+        }
+
+        function genDivision(tier) {
+            const dividend = genNumber(tier);
+            const divisor = randInt(2, 9);
+            return {
+                type: 'division', dividend, divisor,
+                digits: dividend.toString().split('').map(Number),
+                pos: 0, stepState: 'QUOTIENT', quotientDigits: [], runningRemainder: 0
+            };
+        }
+
+        /* ---------- Shared columnar engine (addition / multiplication) ---------- */
+
+        function getD1(p, col) { return getDigitAtColumn(p.num1, col); }
+        function getD2(p, col) { return p.type === 'multiplication' ? p.multiplier : getDigitAtColumn(p.num2, col); }
+
+        function getCarryIn(p, col) {
+            if (col === 0) return 0;
+            const el = document.getElementById(`carry-${col}`);
+            return (el && el.value) ? parseInt(el.value, 10) : 0;
+        }
+
+        function maxLen(p) {
+            if (p.type === 'multiplication') return numLen(p.num1);
+            return Math.max(numLen(p.num1), numLen(p.num2));
+        }
+
+        function computeColumn(p, col) {
+            const d1 = getD1(p, col), d2 = getD2(p, col), cin = getCarryIn(p, col);
+            const raw = p.type === 'multiplication' ? d1 * d2 + cin : d1 + d2 + cin;
+            return { digit: raw % 10, out: Math.floor(raw / 10), d1, d2, cin, raw };
+        }
+
+        function buildColumnarGrid(grid) {
+            const p = problem;
+            const maxDigits = p.maxDigits;
+            const secondDisplay = p.type === 'multiplication' ? p.multiplier : p.num2;
+            const opSymbol = p.type === 'addition' ? '+' : '×';
+            grid.style.gridTemplateColumns = `repeat(${maxDigits}, 50px)`;
+            const s1 = p.num1.toString().padStart(maxDigits, ' ');
+            const s2 = secondDisplay.toString().padStart(maxDigits, ' ');
+
+            for (let i = 0; i < maxDigits; i++) {
+                const col = maxDigits - 1 - i;
+                const div = document.createElement('div');
+                div.className = `grid-item carry-row col-${col}`;
+                if (col > 0) {
+                    const input = document.createElement('input');
+                    input.type = 'text'; input.maxLength = 1; input.className = 'carry-input';
+                    input.id = `carry-${col}`; input.disabled = true;
+                    input.addEventListener('input', e => handleColumnarInput(e, 'CARRY'));
+                    div.appendChild(input);
+                }
+                grid.appendChild(div);
+            }
+
+            for (let i = 0; i < maxDigits; i++) {
+                const col = maxDigits - 1 - i;
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                div.innerText = s1[i] === ' ' ? '' : s1[i];
+                grid.appendChild(div);
+            }
+
+            for (let i = 0; i < maxDigits; i++) {
+                const col = maxDigits - 1 - i;
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                if (i === 0) {
+                    const op = document.createElement('span');
+                    op.className = 'operator'; op.innerText = opSymbol;
+                    div.appendChild(op);
+                } else {
+                    div.innerText = s2[i] === ' ' ? '' : s2[i];
+                }
+                grid.appendChild(div);
+            }
+
+            const line = document.createElement('div');
+            line.className = 'line-row';
+            grid.appendChild(line);
+
+            for (let i = 0; i < maxDigits; i++) {
+                const col = maxDigits - 1 - i;
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 1; input.className = 'answer-input';
+                input.id = `answer-${col}`; input.disabled = true;
+                input.addEventListener('input', e => handleColumnarInput(e, 'ANSWER'));
+                div.appendChild(input);
+                grid.appendChild(div);
+            }
+        }
+
+        function updateColumnarHighlights() {
+            const p = problem;
+            document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('active-column'));
+            document.querySelectorAll(`.col-${p.colIndex}`).forEach(el => el.classList.add('active-column'));
+            document.querySelectorAll('.answer-input, .carry-input').forEach(el => el.disabled = true);
+
+            if (p.stepState === 'ANSWER') {
+                const el = document.getElementById(`answer-${p.colIndex}`);
+                if (el) { el.disabled = false; el.focus(); }
+            } else {
+                const el = document.getElementById(`carry-${p.colIndex + 1}`);
+                if (el) { el.disabled = false; el.focus(); }
+            }
+        }
+
+        function updateColumnarInstruction() {
+            const box = document.getElementById('instruction-box');
+            const p = problem;
+            if (p.stepState === 'ANSWER') {
+                const r = computeColumn(p, p.colIndex);
+                if (p.type === 'addition') box.innerHTML = t('addInstrAnswer', r.d1, r.d2, r.cin, r.raw);
+                else box.innerHTML = t('mulInstrAnswer', r.d1, r.d2, r.cin, r.raw);
+            } else {
+                box.innerHTML = p.type === 'addition' ? t('addInstrCarry') : t('mulInstrCarry');
+            }
+        }
+
+        function handleColumnarInput(event, stepType) {
+            const val = event.target.value;
+            if (!/^\d$/.test(val)) { event.target.value = ''; return; }
+            const digitInput = parseInt(val, 10);
+            const p = problem;
+            const feedback = document.getElementById('feedback-message');
+            const result = computeColumn(p, p.colIndex);
+
+            if (stepType === 'ANSWER') {
+                if (digitInput === result.digit) {
+                    registerCorrect(p.type);
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctDigit');
+                    if (result.out !== 0) {
+                        p.stepState = 'CARRY';
+                        updateColumnarHighlights(); updateColumnarInstruction();
+                    } else {
+                        advanceColumnar(result);
+                    }
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectDigitTry');
+                    event.target.value = '';
+                }
+            } else {
+                if (digitInput === result.out) {
+                    registerCorrect(p.type);
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctCarry');
+                    advanceColumnar(result);
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectCarry');
+                    event.target.value = '';
+                }
+            }
+        }
+
+        function advanceColumnar(result) {
+            const p = problem;
+            const ml = maxLen(p);
+            if (p.colIndex >= ml - 1 && result.out === 0) {
+                finishColumnar();
+            } else {
+                p.colIndex++;
+                p.stepState = 'ANSWER';
+                updateColumnarHighlights(); updateColumnarInstruction();
+            }
+        }
+
+        function finishColumnar() {
+            const p = problem;
+            document.querySelectorAll('.answer-input, .carry-input').forEach(el => el.disabled = true);
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('instruction-box').innerHTML = t('clickNext');
+            const feedback = document.getElementById('feedback-message');
+            feedback.className = 'feedback correct';
+            if (p.type === 'addition') feedback.innerText = t('problemSolvedAdd', p.num1, p.num2, p.num1 + p.num2);
+            else feedback.innerText = t('problemSolvedMul', p.num1, p.multiplier, p.num1 * p.multiplier);
+        }
+
+        /* ---------- Subtraction engine (Polish method: borrow reduces the digit to the left) ---------- */
+
+        function buildSubtractionGrid(grid) {
+            const p = problem;
+            const n = p.colCount;
+            const totalCols = n + 1;
+            grid.style.gridTemplateColumns = `repeat(${totalCols}, 50px)`;
+            const s2 = p.num2.toString().padStart(n, ' ');
+
+            const annoGutter = document.createElement('div');
+            annoGutter.className = 'grid-item anno-row';
+            grid.appendChild(annoGutter);
+            for (let col = n - 1; col >= 0; col--) {
+                const div = document.createElement('div');
+                div.className = `grid-item anno-row col-${col}`;
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 2; input.className = 'anno-input';
+                input.id = `anno-${col}`; input.disabled = true;
+                input.addEventListener('input', e => handleAnnoInput(e, col));
+                div.appendChild(input);
+                grid.appendChild(div);
+            }
+
+            const topGutter = document.createElement('div');
+            topGutter.className = 'grid-item';
+            grid.appendChild(topGutter);
+            for (let col = n - 1; col >= 0; col--) {
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                const digitSpan = document.createElement('span');
+                digitSpan.className = 'top-digit';
+                digitSpan.id = `top-${col}`;
+                digitSpan.innerText = p.topDigits[col];
+                div.appendChild(digitSpan);
+                grid.appendChild(div);
+            }
+
+            const opGutter = document.createElement('div');
+            opGutter.className = 'grid-item';
+            const op = document.createElement('span');
+            op.className = 'operator'; op.innerText = '−';
+            opGutter.appendChild(op);
+            grid.appendChild(opGutter);
+            for (let col = n - 1; col >= 0; col--) {
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                div.innerText = s2[n - 1 - col] === ' ' ? '' : s2[n - 1 - col];
+                grid.appendChild(div);
+            }
+
+            const line = document.createElement('div');
+            line.className = 'line-row';
+            grid.appendChild(line);
+
+            const answerGutter = document.createElement('div');
+            answerGutter.className = 'grid-item';
+            grid.appendChild(answerGutter);
+            for (let col = n - 1; col >= 0; col--) {
+                const div = document.createElement('div');
+                div.className = `grid-item col-${col}`;
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 1; input.className = 'answer-input';
+                input.id = `answer-${col}`; input.disabled = true;
+                input.addEventListener('input', e => handleSubtractionAnswerInput(e));
+                div.appendChild(input);
+                grid.appendChild(div);
+            }
+        }
+
+        function updateSubtractionHighlights() {
+            const p = problem;
+            document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('active-column'));
+            document.querySelectorAll('.anno-input').forEach(el => {
+                if (!el.classList.contains('locked')) {
+                    el.disabled = true;
+                    el.value = '';
+                    el.className = 'anno-input';
+                }
+            });
+            document.querySelectorAll('.answer-input').forEach(el => el.disabled = true);
+
+            if (p.stepState === 'REDUCE') {
+                const col = p.borrowChain[p.chainPos];
+                document.querySelectorAll(`.col-${col}`).forEach(el => el.classList.add('active-column'));
+                const el = document.getElementById(`anno-${col}`);
+                if (el) { el.maxLength = 1; el.disabled = false; el.className = 'anno-input red-anno'; el.focus(); }
+            } else if (p.stepState === 'BOOST') {
+                document.querySelectorAll(`.col-${p.colIndex}`).forEach(el => el.classList.add('active-column'));
+                const el = document.getElementById(`anno-${p.colIndex}`);
+                if (el) { el.maxLength = 2; el.disabled = false; el.className = 'anno-input green-anno'; el.focus(); }
+            } else {
+                document.querySelectorAll(`.col-${p.colIndex}`).forEach(el => el.classList.add('active-column'));
+                const el = document.getElementById(`answer-${p.colIndex}`);
+                if (el) { el.disabled = false; el.focus(); }
+            }
+        }
+
+        function updateSubtractionInstruction() {
+            const box = document.getElementById('instruction-box');
+            const p = problem;
+            if (p.stepState === 'REDUCE') {
+                const col = p.borrowChain[p.chainPos];
+                const d = p.topDigits[col];
+                box.innerHTML = d === 0 ? t('subInstrReduceZero') : t('subInstrReduceLend', d);
+            } else if (p.stepState === 'BOOST') {
+                box.innerHTML = t('subInstrBoost', p.topDigits[p.colIndex]);
+            } else if (p.currentBorrowed) {
+                const boosted = p.topDigits[p.colIndex] + 10;
+                box.innerHTML = t('subInstrAnswerBoosted', boosted, p.bottomDigits[p.colIndex]);
+            } else {
+                box.innerHTML = t('subInstrAnswerPlain', p.topDigits[p.colIndex], p.bottomDigits[p.colIndex]);
+            }
+        }
+
+        function handleAnnoInput(event, col) {
+            const p = problem;
+            const raw = event.target.value.replace(/\D/g, '');
+            event.target.value = raw;
+            const feedback = document.getElementById('feedback-message');
+
+            if (p.stepState === 'REDUCE' && p.borrowChain[p.chainPos] === col) {
+                if (raw.length < 1) return;
+                const digitInput = parseInt(raw, 10);
+                const isLast = p.chainPos === p.borrowChain.length - 1;
+                const expected = isLast ? (p.topDigits[col] - 1) : 9;
+                if (digitInput === expected) {
+                    registerCorrect('subtraction');
+                    p.topDigits[col] = expected;
+                    event.target.value = expected;
+                    event.target.disabled = true;
+                    event.target.classList.add('locked');
+                    document.getElementById(`top-${col}`).classList.add('struck-red');
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctBorrow');
+                    p.chainPos++;
+                    if (p.chainPos >= p.borrowChain.length) {
+                        p.stepState = 'BOOST';
+                        p.colIndex = p.pendingAnswerCol;
+                    }
+                    updateSubtractionHighlights();
+                    updateSubtractionInstruction();
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectBorrow');
+                    event.target.value = '';
+                }
+            } else if (p.stepState === 'BOOST' && p.colIndex === col) {
+                if (raw.length < 2) return;
+                const digitInput = parseInt(raw, 10);
+                const expected = p.topDigits[col] + 10;
+                if (digitInput === expected) {
+                    registerCorrect('subtraction');
+                    event.target.value = expected;
+                    event.target.disabled = true;
+                    event.target.classList.add('locked');
+                    document.getElementById(`top-${col}`).classList.add('struck-green');
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctBoost');
+                    p.stepState = 'ANSWER';
+                    updateSubtractionHighlights();
+                    updateSubtractionInstruction();
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectBoost');
+                    event.target.value = '';
+                }
+            }
+        }
+
+        function handleSubtractionAnswerInput(event) {
+            const val = event.target.value;
+            if (!/^\d$/.test(val)) { event.target.value = ''; return; }
+            const digitInput = parseInt(val, 10);
+            const p = problem;
+            const col = p.colIndex;
+            const topVal = p.currentBorrowed ? p.topDigits[col] + 10 : p.topDigits[col];
+            const expected = topVal - p.bottomDigits[col];
+            const feedback = document.getElementById('feedback-message');
+
+            if (digitInput === expected) {
+                registerCorrect('subtraction');
+                event.target.classList.add('locked-answer');
+                feedback.className = 'feedback correct';
+                feedback.innerText = t('correctDigit');
+                if (col >= p.colCount - 1) {
+                    finishSubtraction();
+                } else {
+                    setupSubtractionColumn(p, col + 1);
+                    updateSubtractionHighlights();
+                    updateSubtractionInstruction();
+                }
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerText = t('incorrectDigitTry');
+                event.target.value = '';
+            }
+        }
+
+        function finishSubtraction() {
+            const p = problem;
+            document.querySelectorAll('.anno-input, .answer-input').forEach(el => el.disabled = true);
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('instruction-box').innerHTML = t('clickNext');
+            const feedback = document.getElementById('feedback-message');
+            feedback.className = 'feedback correct';
+            feedback.innerText = t('problemSolvedSub', p.num1, p.num2, p.num1 - p.num2);
+        }
+
+        /* ---------- Division engine ---------- */
+
+        function buildDivisionGrid(grid) {
+            const p = problem;
+
+            const qRow = document.createElement('div');
+            qRow.className = 'quotient-row';
+            const spacer = document.createElement('span');
+            spacer.className = 'div-spacer';
+            qRow.appendChild(spacer);
+            p.digits.forEach((d, i) => {
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 1; input.className = 'q-input';
+                input.id = `q-${i}`; input.disabled = true;
+                input.addEventListener('input', e => handleDivisionInput(e, 'QUOTIENT', i));
+                qRow.appendChild(input);
+            });
+            grid.appendChild(qRow);
+
+            const mainRow = document.createElement('div');
+            mainRow.className = 'division-main';
+            const divisorSpan = document.createElement('span');
+            divisorSpan.className = 'divisor';
+            divisorSpan.innerText = p.divisor;
+            mainRow.appendChild(divisorSpan);
+            const bracket = document.createElement('span');
+            bracket.className = 'bracket';
+            p.digits.forEach((d, i) => {
+                const dSpan = document.createElement('span');
+                dSpan.className = 'dividend-digit';
+                dSpan.id = `dd-${i}`;
+                dSpan.innerText = d;
+                bracket.appendChild(dSpan);
+            });
+            mainRow.appendChild(bracket);
+            grid.appendChild(mainRow);
+
+            const remBox = document.createElement('div');
+            remBox.className = 'remainder-box hidden';
+            remBox.id = 'remainder-box';
+            const remLabel = document.createElement('label');
+            remLabel.id = 'remainder-label';
+            remLabel.innerText = t('remainderLabel');
+            const remInput = document.createElement('input');
+            remInput.type = 'text'; remInput.maxLength = 1; remInput.className = 'answer-input';
+            remInput.id = 'remainder-input'; remInput.disabled = true;
+            remInput.addEventListener('input', e => handleDivisionInput(e, 'REMAINDER'));
+            remBox.appendChild(remLabel); remBox.appendChild(remInput);
+            grid.appendChild(remBox);
+        }
+
+        function currentDivisionValue(p) { return p.runningRemainder * 10 + p.digits[p.pos]; }
+
+        function updateDivisionHighlights() {
+            const p = problem;
+            document.querySelectorAll('.q-input').forEach(el => { el.disabled = true; el.classList.remove('active-q'); });
+            const remInput = document.getElementById('remainder-input');
+            const remBox = document.getElementById('remainder-box');
+            remInput.disabled = true;
+            remBox.classList.add('hidden');
+            document.querySelectorAll('.dividend-digit').forEach(el => el.classList.remove('active-column'));
+
+            const activeDigit = document.getElementById(`dd-${p.pos}`);
+            if (activeDigit) activeDigit.classList.add('active-column');
+
+            if (p.stepState === 'QUOTIENT') {
+                const qEl = document.getElementById(`q-${p.pos}`);
+                if (qEl) { qEl.disabled = false; qEl.classList.add('active-q'); qEl.focus(); }
+            } else {
+                remBox.classList.remove('hidden');
+                document.getElementById('remainder-label').innerText = t('remainderLabel');
+                remInput.disabled = false;
+                remInput.value = '';
+                remInput.focus();
+            }
+        }
+
+        function divisionInstructionHTML() {
+            const p = problem;
+            const value = currentDivisionValue(p);
+            if (p.stepState === 'QUOTIENT') {
+                return t('divInstrQuotient', value, p.divisor);
+            }
+            const q = p.quotientDigits[p.pos];
+            const product = p.divisor * q;
+            return t('divInstrRemainder', value, p.divisor, q, product);
+        }
+
+        function handleDivisionInput(event, stepType) {
+            const val = event.target.value;
+            if (!/^\d$/.test(val)) { event.target.value = ''; return; }
+            const digitInput = parseInt(val, 10);
+            const p = problem;
+            const feedback = document.getElementById('feedback-message');
+            const value = currentDivisionValue(p);
+
+            if (stepType === 'QUOTIENT') {
+                const expected = Math.floor(value / p.divisor);
+                if (digitInput === expected) {
+                    registerCorrect('division');
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctQuotient');
+                    p.quotientDigits[p.pos] = digitInput;
+                    const qEl = document.getElementById(`q-${p.pos}`);
+                    qEl.value = digitInput; qEl.disabled = true;
+                    p.stepState = 'REMAINDER';
+                    updateDivisionHighlights(); updateInstruction();
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectQuotient');
+                    event.target.value = '';
+                }
+            } else {
+                const expected = value % p.divisor;
+                if (digitInput === expected) {
+                    registerCorrect('division');
+                    feedback.className = 'feedback correct';
+                    feedback.innerText = t('correctRemainder');
+                    p.runningRemainder = digitInput;
+                    if (p.pos >= p.digits.length - 1) {
+                        finishDivision();
+                    } else {
+                        p.pos++;
+                        p.stepState = 'QUOTIENT';
+                        updateDivisionHighlights(); updateInstruction();
+                    }
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerText = t('incorrectRemainder');
+                    event.target.value = '';
+                }
+            }
+        }
+
+        function finishDivision() {
+            const p = problem;
+            document.querySelectorAll('.q-input').forEach(el => el.disabled = true);
+            const remInput = document.getElementById('remainder-input');
+            if (remInput) remInput.disabled = true;
+            document.getElementById('remainder-box').classList.add('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('instruction-box').innerHTML = t('clickNext');
+            const quotient = parseInt(p.quotientDigits.join(''), 10);
+            const remainder = p.runningRemainder;
+            const feedback = document.getElementById('feedback-message');
+            feedback.className = 'feedback correct';
+            feedback.innerText = t('problemSolvedDiv', p.dividend, p.divisor, quotient, remainder);
+        }
+
+        /* ---------- Dispatch layer ---------- */
+
+        function buildGrid() {
+            const grid = document.getElementById('math-grid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = '';
+            if (problem.type === 'division') {
+                grid.className = 'division-board';
+                buildDivisionGrid(grid);
+            } else if (problem.type === 'subtraction') {
+                grid.className = 'math-container';
+                buildSubtractionGrid(grid);
+            } else {
+                grid.className = 'math-container';
+                buildColumnarGrid(grid);
+            }
+        }
+
+        function updateHighlights() {
+            if (problem.type === 'division') updateDivisionHighlights();
+            else if (problem.type === 'subtraction') updateSubtractionHighlights();
+            else updateColumnarHighlights();
+        }
+
+        function updateInstruction() {
+            const box = document.getElementById('instruction-box');
+            if (problem.type === 'division') box.innerHTML = divisionInstructionHTML();
+            else if (problem.type === 'subtraction') updateSubtractionInstruction();
+            else updateColumnarInstruction();
+        }
+
+        function registerCorrect(type) {
+            score += 10;
+            stats[type] = (stats[type] || 0) + 1;
+            saveStats();
+            document.getElementById('score-tracker').textContent = t('score', score);
+        }
+
+        function updateRoundScoreText() {
+            document.getElementById('round-tracker').textContent = t('round', currentRound, totalRounds);
+            document.getElementById('score-tracker').textContent = t('score', score);
+        }
+
+        function generateRound() {
+            document.getElementById('lang-toggle-game').textContent = lang === 'en' ? 'PL' : 'EN';
+            updateRoundScoreText();
+            document.getElementById('feedback-message').className = 'feedback';
+            document.getElementById('feedback-message').innerText = '';
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('next-btn').textContent = t('nextRound');
+
+            const type = selectedTypes[Math.floor(Math.random() * selectedTypes.length)];
+            problem = generateProblem(type, currentRound, totalRounds);
+            buildGrid();
+            updateHighlights();
+            updateInstruction();
+        }
+
+        function nextRound() {
+            if (currentRound < totalRounds) {
+                currentRound++;
+                generateRound();
+            } else {
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('end-screen').classList.remove('hidden');
+                renderEndScreen();
+            }
+        }
+
+        function renderEndScreen() {
+            document.getElementById('end-title').textContent = t('congrats');
+            document.getElementById('end-message').textContent = t('finishedAll');
+            document.getElementById('final-score').textContent = t('finalScore', score);
+            document.getElementById('play-again-btn').textContent = t('playAgain');
+            document.getElementById('lang-toggle-end').textContent = lang === 'en' ? 'PL' : 'EN';
+        }
+
+        renderMenu();
+    </script>
 </body>
 </html>
