@@ -310,6 +310,228 @@
             gap: 10px;
             font-size: 1rem;
         }
+
+        /* Exam mode */
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            max-width: 160px;
+            padding: 10px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .mode-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .exam-card-wrapper {
+            max-width: 1000px !important;
+        }
+
+        .exam-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .exam-card {
+            border: 2px solid #eef0f2;
+            border-radius: 10px;
+            padding: 15px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .exam-card.correct {
+            border-color: var(--success);
+            background: rgba(46, 196, 182, 0.08);
+        }
+
+        .exam-card.incorrect {
+            border-color: var(--error);
+            background: rgba(231, 29, 54, 0.06);
+        }
+
+        .exam-mini-grid {
+            display: inline-grid;
+            grid-gap: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 5px 0;
+        }
+
+        .exam-cell {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exam-input {
+            width: 30px;
+            height: 34px;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .exam-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #eef5fc;
+        }
+
+        .exam-input:disabled {
+            opacity: 1;
+            background-color: white;
+            color: var(--text);
+        }
+
+        .exam-line {
+            grid-column: 1 / -1;
+            border-bottom: 3px solid var(--text);
+            height: 0;
+            margin: 3px 0;
+        }
+
+        .exam-scratch-row {
+            height: 26px;
+        }
+
+        .exam-scratch-input {
+            width: 26px;
+            height: 22px;
+            font-size: 0.85rem;
+            text-align: center;
+            border: 2px dashed #cfd6dd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-weight: bold;
+            color: #7f8c8d;
+            background: transparent;
+        }
+
+        .exam-scratch-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            border-style: solid;
+            background-color: #eef5fc;
+        }
+
+        .exam-scratch-input:disabled {
+            opacity: 0.7;
+        }
+
+        .exam-top-digit {
+            cursor: pointer;
+            user-select: none;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .exam-top-digit:hover {
+            background-color: rgba(74, 144, 226, 0.12);
+        }
+
+        .exam-top-digit.struck {
+            color: var(--error);
+            text-decoration: line-through;
+            text-decoration-color: var(--error);
+            text-decoration-thickness: 3px;
+        }
+
+        .exam-division-board {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        .exam-division-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 1.3rem;
+        }
+
+        .exam-divisor {
+            padding-right: 6px;
+        }
+
+        .exam-bracket {
+            display: flex;
+            border-top: 3px solid var(--text);
+            border-left: 3px solid var(--text);
+            padding: 2px 6px 2px 5px;
+        }
+
+        .exam-dividend-digit {
+            width: 26px;
+            display: inline-block;
+        }
+
+        .exam-quotient-row, .exam-remainder-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 10px;
+        }
+
+        .exam-r-label {
+            font-size: 0.8rem;
+            font-family: inherit;
+            font-weight: normal;
+            color: #7f8c8d;
+            margin-right: 4px;
+        }
+
+        .exam-feedback {
+            margin-top: 12px;
+            font-weight: bold;
+            min-height: 22px;
+        }
+
+        .exam-feedback.correct-fb {
+            color: var(--success);
+            font-size: 1.6rem;
+        }
+
+        .exam-feedback.incorrect-fb {
+            color: var(--error);
+            font-size: 0.85rem;
+        }
+
+        .exam-summary {
+            margin: 20px 0;
+        }
+
+        .exam-summary.pass h2 {
+            color: var(--success);
+        }
+
+        .exam-summary.fail h2 {
+            color: var(--error);
+        }
     </style>
 </head>
 <body>
@@ -322,21 +544,43 @@
         <h1 id="menu-title">Column Math Master</h1>
         <p id="menu-tagline">Learn written math, one step at a time!</p>
 
+        <div class="mode-tabs">
+            <button class="mode-tab active" id="tab-practice" onclick="switchMode('practice')">Practice</button>
+            <button class="mode-tab" id="tab-exam" onclick="switchMode('exam')">Exam</button>
+        </div>
+
         <p id="choose-ops-label" style="text-align:left; font-weight:bold; margin-bottom:5px;">Choose what to practice:</p>
         <div class="op-list" id="op-list"></div>
         <p class="warning hidden" id="select-warning"></p>
 
-        <label id="rounds-label" for="round-select"><strong>Number of rounds:</strong></label><br><br>
-        <select id="round-select">
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10" selected>10</option>
-        </select>
-        <br>
-        <button class="btn" id="start-btn" onclick="startGame()">Start Game</button>
+        <div id="practice-options">
+            <label id="rounds-label" for="round-select"><strong>Number of rounds:</strong></label><br><br>
+            <select id="round-select">
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10" selected>10</option>
+            </select>
+            <br>
+            <button class="btn" id="start-btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="exam-options" class="hidden">
+            <label id="equations-label" for="equations-select"><strong>Number of equations:</strong></label><br><br>
+            <select id="equations-select">
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6" selected>6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+            <br>
+            <button class="btn" id="start-exam-btn" onclick="startExam()">Start Exam</button>
+        </div>
     </div>
 
     <div id="game-screen" class="card hidden">
@@ -368,6 +612,24 @@
         <p id="end-message">You have finished all the rounds!</p>
         <h2 id="final-score">Final Score: 0</h2>
         <button class="btn" id="play-again-btn" onclick="backToMenu()">Play Again</button>
+    </div>
+
+    <div id="exam-screen" class="card exam-card-wrapper hidden">
+        <div class="topbar">
+            <button class="btn small" onclick="backToMenu()" id="menu-btn-exam">Menu</button>
+            <button class="btn small" id="lang-toggle-exam" onclick="toggleLang()">PL</button>
+        </div>
+        <h1 id="exam-title">Exam</h1>
+
+        <div class="exam-grid" id="exam-grid"></div>
+
+        <div id="exam-summary" class="exam-summary hidden">
+            <h2 id="exam-score-text"></h2>
+            <p id="exam-pass-text"></p>
+        </div>
+
+        <button id="check-answers-btn" class="btn" onclick="checkExamAnswers()">Check Answers</button>
+        <button id="exam-menu-btn" class="btn hidden" onclick="backToMenu()">Back to Menu</button>
     </div>
 
     <script>
@@ -427,6 +689,17 @@
                 problemSolvedDiv: (n1, n2, q, r) => r > 0
                     ? `Fantastic! ${n1} ÷ ${n2} = ${q} remainder ${r}. Problem solved!`
                     : `Fantastic! ${n1} ÷ ${n2} = ${q}. Problem solved!`,
+                modePractice: 'Practice',
+                modeExam: 'Exam',
+                chooseEquations: 'Number of equations:',
+                startExam: 'Start Exam',
+                examTitle: 'Exam',
+                checkAnswersBtn: 'Check Answers',
+                correctAnswerIs: (ans) => `Correct answer: ${ans}`,
+                correctAnswerIsDiv: (q, r) => r > 0 ? `Correct answer: ${q} remainder ${r}` : `Correct answer: ${q}`,
+                examScoreText: (correct, total, pct, points) => `You solved ${correct} of ${total} (${pct}%) — ${points} points`,
+                examPass: 'You passed! 🎉',
+                examFail: 'Not quite — keep practicing!',
             },
             pl: {
                 appTitle: 'Mistrz Matematyki Pisemnej',
@@ -483,6 +756,17 @@
                 problemSolvedDiv: (n1, n2, q, r) => r > 0
                     ? `Wspaniale! ${n1} ÷ ${n2} = ${q} reszty ${r}. Zadanie rozwiązane!`
                     : `Wspaniale! ${n1} ÷ ${n2} = ${q}. Zadanie rozwiązane!`,
+                modePractice: 'Trening',
+                modeExam: 'Egzamin',
+                chooseEquations: 'Liczba zadań:',
+                startExam: 'Rozpocznij egzamin',
+                examTitle: 'Egzamin',
+                checkAnswersBtn: 'Sprawdź odpowiedzi',
+                correctAnswerIs: (ans) => `Poprawna odpowiedź: ${ans}`,
+                correctAnswerIsDiv: (q, r) => r > 0 ? `Poprawna odpowiedź: ${q} reszty ${r}` : `Poprawna odpowiedź: ${q}`,
+                examScoreText: (correct, total, pct, points) => `Rozwiązano ${correct} z ${total} (${pct}%) — ${points} punktów`,
+                examPass: 'Zdałeś! 🎉',
+                examFail: 'Niestety, nie udało się — ćwicz dalej!',
             }
         };
 
@@ -498,6 +782,9 @@
         let currentRound = 1;
         let score = 0;
         let problem = null;
+
+        let activeMode = 'practice';
+        let examProblems = [];
 
         function loadStats() {
             const base = { addition: 0, subtraction: 0, multiplication: 0, division: 0 };
@@ -535,6 +822,8 @@
                 document.getElementById('next-btn').textContent = t('nextRound');
                 updateRoundScoreText();
                 updateInstruction();
+            } else if (!document.getElementById('exam-screen').classList.contains('hidden')) {
+                refreshExamScreenText();
             } else {
                 renderEndScreen();
             }
@@ -550,6 +839,11 @@
             document.getElementById('start-btn').textContent = t('startGame');
             document.getElementById('lang-toggle').textContent = lang === 'en' ? 'PL' : 'EN';
             document.getElementById('select-warning').textContent = t('selectAtLeastOne');
+            document.getElementById('tab-practice').textContent = t('modePractice');
+            document.getElementById('tab-exam').textContent = t('modeExam');
+            document.getElementById('equations-label').innerHTML = `<strong>${t('chooseEquations')}</strong>`;
+            document.getElementById('start-exam-btn').textContent = t('startExam');
+            switchMode(activeMode);
 
             const list = document.getElementById('op-list');
             list.innerHTML = '';
@@ -588,6 +882,14 @@
             document.getElementById('select-warning').classList.add('hidden');
         }
 
+        function switchMode(mode) {
+            activeMode = mode;
+            document.getElementById('tab-practice').classList.toggle('active', mode === 'practice');
+            document.getElementById('tab-exam').classList.toggle('active', mode === 'exam');
+            document.getElementById('practice-options').classList.toggle('hidden', mode !== 'practice');
+            document.getElementById('exam-options').classList.toggle('hidden', mode !== 'exam');
+        }
+
         function startGame() {
             if (selectedTypes.length === 0) {
                 document.getElementById('select-warning').classList.remove('hidden');
@@ -605,6 +907,7 @@
         function backToMenu() {
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('exam-screen').classList.add('hidden');
             document.getElementById('setup-screen').classList.remove('hidden');
             renderMenu();
         }
@@ -1243,6 +1546,282 @@
             const feedback = document.getElementById('feedback-message');
             feedback.className = 'feedback correct';
             feedback.innerText = t('problemSolvedDiv', p.dividend, p.divisor, quotient, remainder);
+        }
+
+        /* ---------- Exam mode ---------- */
+
+        function genExamProblem(type, index, total) {
+            const tier = digitTier(index + 1, total);
+            if (type === 'addition') {
+                const num1 = genNumber(tier);
+                const num2 = genNumber(tier);
+                const answer = num1 + num2;
+                return { type, num1, num2, answer, answerLen: numLen(answer) };
+            }
+            if (type === 'subtraction') {
+                let num1 = genNumber(tier);
+                let num2 = genNumber(tier);
+                if (num1 < num2) { const tmp = num1; num1 = num2; num2 = tmp; }
+                const answer = num1 - num2;
+                return { type, num1, num2, answer, answerLen: numLen(answer) };
+            }
+            if (type === 'multiplication') {
+                const num1 = genNumber(tier);
+                const multiplier = randInt(2, 9);
+                const answer = num1 * multiplier;
+                return { type, num1, num2: multiplier, answer, answerLen: numLen(answer) };
+            }
+            const dividend = genNumber(tier);
+            const divisor = randInt(2, 9);
+            const answer = Math.floor(dividend / divisor);
+            const remainder = dividend % divisor;
+            return { type, num1: dividend, num2: divisor, answer, remainder, answerLen: numLen(answer) };
+        }
+
+        function buildExamTypeSequence(types, count) {
+            const seq = [];
+            for (let i = 0; i < count; i++) seq.push(types[i % types.length]);
+            for (let i = seq.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [seq[i], seq[j]] = [seq[j], seq[i]];
+            }
+            return seq;
+        }
+
+        function startExam() {
+            if (selectedTypes.length === 0) {
+                document.getElementById('select-warning').classList.remove('hidden');
+                return;
+            }
+            const examCount = parseInt(document.getElementById('equations-select').value, 10);
+            const seq = buildExamTypeSequence(selectedTypes, examCount);
+            examProblems = seq.map((type, i) => genExamProblem(type, i, examCount));
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('exam-screen').classList.remove('hidden');
+            refreshExamScreenText();
+            buildExamGrid();
+        }
+
+        function refreshExamScreenText() {
+            document.getElementById('exam-title').textContent = t('examTitle');
+            document.getElementById('lang-toggle-exam').textContent = lang === 'en' ? 'PL' : 'EN';
+            document.getElementById('menu-btn-exam').textContent = t('menu');
+            document.getElementById('check-answers-btn').textContent = t('checkAnswersBtn');
+            document.querySelectorAll('.exam-r-label').forEach(el => { el.textContent = t('remainderLabel'); });
+        }
+
+        function handleExamDigitInput(event) {
+            const val = event.target.value;
+            if (!/^\d$/.test(val)) { event.target.value = ''; return; }
+            const allInputs = Array.from(document.querySelectorAll('.exam-input'));
+            const idx = allInputs.indexOf(event.target);
+            if (idx >= 0 && idx < allInputs.length - 1) allInputs[idx + 1].focus();
+        }
+
+        function buildExamColumnarCard(card, p, i) {
+            const opSymbol = p.type === 'addition' ? '+' : (p.type === 'subtraction' ? '−' : '×');
+            const width = Math.max(numLen(p.num1), numLen(p.num2), p.answerLen);
+            const mini = document.createElement('div');
+            mini.className = 'exam-mini-grid';
+            mini.style.gridTemplateColumns = `repeat(${width + 1}, 34px)`;
+            const s1 = p.num1.toString().padStart(width, ' ');
+            const s2 = p.num2.toString().padStart(width, ' ');
+
+            const scratchGutter = document.createElement('div');
+            scratchGutter.className = 'exam-cell exam-scratch-row';
+            mini.appendChild(scratchGutter);
+            for (let k = 0; k < width; k++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell exam-scratch-row';
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 2; input.className = 'exam-scratch-input';
+                input.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+                cell.appendChild(input);
+                mini.appendChild(cell);
+            }
+
+            const gutter1 = document.createElement('div');
+            gutter1.className = 'exam-cell';
+            mini.appendChild(gutter1);
+            for (let k = 0; k < width; k++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
+                if (s1[k] !== ' ') {
+                    const digitSpan = document.createElement('span');
+                    digitSpan.className = 'exam-top-digit';
+                    digitSpan.innerText = s1[k];
+                    digitSpan.addEventListener('click', () => {
+                        if (document.getElementById('check-answers-btn').classList.contains('hidden')) return;
+                        digitSpan.classList.toggle('struck');
+                    });
+                    cell.appendChild(digitSpan);
+                }
+                mini.appendChild(cell);
+            }
+
+            const opCell = document.createElement('div');
+            opCell.className = 'exam-cell';
+            const opSpan = document.createElement('span');
+            opSpan.innerText = opSymbol;
+            opCell.appendChild(opSpan);
+            mini.appendChild(opCell);
+            for (let k = 0; k < width; k++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
+                cell.innerText = s2[k] === ' ' ? '' : s2[k];
+                mini.appendChild(cell);
+            }
+
+            const line = document.createElement('div');
+            line.className = 'exam-line';
+            mini.appendChild(line);
+
+            const gutter3 = document.createElement('div');
+            gutter3.className = 'exam-cell';
+            mini.appendChild(gutter3);
+            const ansPad = width - p.answerLen;
+            for (let k = 0; k < width; k++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
+                if (k >= ansPad) {
+                    const input = document.createElement('input');
+                    input.type = 'text'; input.maxLength = 1; input.className = 'exam-input';
+                    input.id = `exam-ans-${i}-${k - ansPad}`;
+                    input.addEventListener('input', handleExamDigitInput);
+                    cell.appendChild(input);
+                }
+                mini.appendChild(cell);
+            }
+            card.appendChild(mini);
+        }
+
+        function buildExamDivisionCard(card, p, i) {
+            const board = document.createElement('div');
+            board.className = 'exam-division-board';
+
+            const mainRow = document.createElement('div');
+            mainRow.className = 'exam-division-row';
+            const divisorSpan = document.createElement('span');
+            divisorSpan.className = 'exam-divisor';
+            divisorSpan.innerText = p.num2;
+            mainRow.appendChild(divisorSpan);
+            const bracket = document.createElement('span');
+            bracket.className = 'exam-bracket';
+            p.num1.toString().split('').forEach(d => {
+                const s = document.createElement('span');
+                s.className = 'exam-dividend-digit';
+                s.innerText = d;
+                bracket.appendChild(s);
+            });
+            mainRow.appendChild(bracket);
+            board.appendChild(mainRow);
+
+            const qRow = document.createElement('div');
+            qRow.className = 'exam-quotient-row';
+            for (let k = 0; k < p.answerLen; k++) {
+                const input = document.createElement('input');
+                input.type = 'text'; input.maxLength = 1; input.className = 'exam-input';
+                input.id = `exam-q-${i}-${k}`;
+                input.addEventListener('input', handleExamDigitInput);
+                qRow.appendChild(input);
+            }
+            board.appendChild(qRow);
+
+            const rRow = document.createElement('div');
+            rRow.className = 'exam-remainder-row';
+            const rLabel = document.createElement('span');
+            rLabel.className = 'exam-r-label';
+            rLabel.textContent = t('remainderLabel');
+            const rInput = document.createElement('input');
+            rInput.type = 'text'; rInput.maxLength = 1; rInput.className = 'exam-input';
+            rInput.id = `exam-r-${i}`;
+            rInput.addEventListener('input', handleExamDigitInput);
+            rRow.appendChild(rLabel);
+            rRow.appendChild(rInput);
+            board.appendChild(rRow);
+
+            card.appendChild(board);
+        }
+
+        function buildExamGrid() {
+            const grid = document.getElementById('exam-grid');
+            grid.innerHTML = '';
+            examProblems.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = 'exam-card';
+                card.id = `exam-card-${i}`;
+                if (p.type === 'division') buildExamDivisionCard(card, p, i);
+                else buildExamColumnarCard(card, p, i);
+                const fb = document.createElement('div');
+                fb.className = 'exam-feedback';
+                fb.id = `exam-feedback-${i}`;
+                card.appendChild(fb);
+                grid.appendChild(card);
+            });
+            document.getElementById('exam-summary').classList.add('hidden');
+            document.getElementById('check-answers-btn').classList.remove('hidden');
+            document.getElementById('exam-menu-btn').classList.add('hidden');
+        }
+
+        function registerExamCorrect(type) {
+            stats[type] = (stats[type] || 0) + 1;
+            saveStats();
+        }
+
+        function checkExamAnswers() {
+            let correctCount = 0;
+            examProblems.forEach((p, i) => {
+                let userCorrect;
+                if (p.type === 'division') {
+                    let qStr = '';
+                    for (let k = 0; k < p.answerLen; k++) {
+                        const el = document.getElementById(`exam-q-${i}-${k}`);
+                        qStr += (el && el.value) ? el.value : '_';
+                    }
+                    const rEl = document.getElementById(`exam-r-${i}`);
+                    const rVal = (rEl && rEl.value) ? parseInt(rEl.value, 10) : NaN;
+                    const qVal = parseInt(qStr, 10);
+                    userCorrect = qVal === p.answer && rVal === p.remainder;
+                } else {
+                    let ansStr = '';
+                    for (let k = 0; k < p.answerLen; k++) {
+                        const el = document.getElementById(`exam-ans-${i}-${k}`);
+                        ansStr += (el && el.value) ? el.value : '_';
+                    }
+                    userCorrect = parseInt(ansStr, 10) === p.answer;
+                }
+
+                const card = document.getElementById(`exam-card-${i}`);
+                const fb = document.getElementById(`exam-feedback-${i}`);
+                card.querySelectorAll('input').forEach(el => el.disabled = true);
+
+                if (userCorrect) {
+                    correctCount++;
+                    card.classList.add('correct');
+                    fb.className = 'exam-feedback correct-fb';
+                    fb.innerHTML = '&#10003;';
+                    registerExamCorrect(p.type);
+                } else {
+                    card.classList.add('incorrect');
+                    fb.className = 'exam-feedback incorrect-fb';
+                    fb.textContent = p.type === 'division'
+                        ? t('correctAnswerIsDiv', p.answer, p.remainder)
+                        : t('correctAnswerIs', p.answer);
+                }
+            });
+
+            const total = examProblems.length;
+            const pct = Math.round((correctCount / total) * 100);
+            const points = correctCount * 10;
+            const passed = correctCount / total > 0.5;
+
+            const summary = document.getElementById('exam-summary');
+            summary.classList.remove('hidden');
+            summary.className = 'exam-summary ' + (passed ? 'pass' : 'fail');
+            document.getElementById('exam-score-text').textContent = t('examScoreText', correctCount, total, pct, points);
+            document.getElementById('exam-pass-text').textContent = passed ? t('examPass') : t('examFail');
+            document.getElementById('check-answers-btn').classList.add('hidden');
+            document.getElementById('exam-menu-btn').classList.remove('hidden');
         }
 
         /* ---------- Dispatch layer ---------- */
