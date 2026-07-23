@@ -139,7 +139,7 @@
             height: 35px;
         }
 
-        .carry-input, .answer-input, .q-input, .top-input {
+        .carry-input, .answer-input, .top-input {
             width: 40px;
             height: 40px;
             font-size: 1.5rem;
@@ -156,7 +156,7 @@
             font-size: 1.1rem;
         }
 
-        .carry-input:focus, .answer-input:focus, .q-input:focus, .top-input:focus {
+        .carry-input:focus, .answer-input:focus, .top-input:focus {
             outline: none;
             border-color: var(--primary);
             background-color: #eef5fc;
@@ -216,7 +216,7 @@
             color: var(--primary);
         }
 
-        .active-column, .active-q {
+        .active-column {
             background-color: rgba(74, 144, 226, 0.15);
             border-radius: 5px;
         }
@@ -251,65 +251,75 @@
             text-align: left;
         }
 
-        /* Division board */
-        .division-board {
-            display: inline-block;
-            margin: 30px auto;
+        /* Division board (column-aligned, dividend : divisor) */
+        .division-grid {
+            display: inline-grid;
+            grid-gap: 4px;
             font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 20px auto;
+            justify-content: center;
+        }
+
+        .div-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .div-box {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .div-box-static {
+            border: 2px solid #cfd6dd;
+            border-radius: 5px;
+        }
+
+        .div-input {
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-family: inherit;
             font-weight: bold;
         }
 
-        .quotient-row {
-            display: flex;
+        .div-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #eef5fc;
         }
 
-        .div-spacer {
-            display: inline-block;
-            width: 44px;
-            flex-shrink: 0;
+        .div-line-row {
+            grid-column: 1 / -1;
+            border-bottom: 3px solid var(--text);
+            height: 0;
+            margin: 3px 0;
         }
 
-        .q-input {
-            width: 40px;
-            height: 40px;
+        .div-divisor-label {
+            justify-content: flex-start;
+            white-space: nowrap;
+            width: auto;
+        }
+
+        .div-minus-sign {
             font-size: 1.3rem;
         }
 
-        .division-main {
-            display: flex;
-            align-items: center;
-            font-size: 2rem;
-            margin-top: 4px;
-        }
-
-        .divisor {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 34px;
-        }
-
-        .bracket {
-            display: flex;
-            border-top: 4px solid var(--text);
-            border-left: 4px solid var(--text);
-            padding: 2px 8px 2px 6px;
-        }
-
-        .dividend-digit {
-            width: 40px;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .remainder-box {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 1rem;
-        }
+        .div-color-a { color: #2ec4b6; }
+        .div-color-b { color: #9b59b6; }
 
         /* Exam mode */
         .mode-tabs {
@@ -460,36 +470,37 @@
             text-decoration-thickness: 3px;
         }
 
-        .exam-division-board {
+        .exam-div-grid {
+            display: inline-grid;
+            grid-gap: 4px;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
-        }
-
-        .exam-division-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
             font-size: 1.3rem;
+            margin: 5px 0;
         }
 
-        .exam-divisor {
-            padding-right: 6px;
+        .exam-div-box-static {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+            border: 2px solid #cfd6dd;
+            border-radius: 5px;
         }
 
-        .exam-bracket {
-            display: flex;
-            border-top: 3px solid var(--text);
-            border-left: 3px solid var(--text);
-            padding: 2px 6px 2px 5px;
+        .exam-div-line {
+            grid-column: 1 / -1;
+            border-bottom: 3px solid var(--text);
+            height: 0;
+            margin: 3px 0;
         }
 
-        .exam-dividend-digit {
-            width: 26px;
-            display: inline-block;
+        .exam-div-divisor-label {
+            justify-content: flex-start;
+            white-space: nowrap;
+            width: auto;
         }
 
-        .exam-quotient-row, .exam-remainder-row {
+        .exam-remainder-row {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -658,12 +669,14 @@
                 correctCarry: 'Correct carry!',
                 correctBorrow: 'Correct borrow!',
                 correctQuotient: 'Correct quotient digit!',
-                correctRemainder: 'Correct remainder!',
+                correctSubtrahendDigit: 'Correct!',
+                correctDifferenceDigit: 'Correct!',
                 incorrectDigitTry: 'Oops, try that column again.',
                 incorrectCarry: 'Incorrect carry value. Look at the tens place of your column sum!',
                 incorrectBorrow: 'Incorrect borrow value. Did you need to borrow from the next column? (0 or 1)',
                 incorrectQuotient: 'Incorrect quotient digit. How many whole times does the divisor fit into this value?',
-                incorrectRemainder: 'Incorrect remainder. Subtract (divisor × quotient digit) from the current value.',
+                incorrectSubtrahendDigit: 'Not quite — check your multiplication (divisor × quotient digit).',
+                incorrectDifferenceDigit: 'Not quite — check your subtraction.',
                 remainderLabel: 'Remainder:',
                 clickNext: "Click 'Next Round' to proceed!",
                 addInstrAnswer: (d1, d2, cin, sum) => cin > 0
@@ -681,8 +694,9 @@
                     ? `Multiply and add your carry: <strong>${d1} × ${d2} + ${cin} (carry) = ${prod}</strong>.<br>Enter the single units digit below.`
                     : `Multiply the column digit: <strong>${d1} × ${d2} = ${prod}</strong>.<br>Enter the single units digit below.`,
                 mulInstrCarry: "Great! What is the carry digit for the next column? Enter it above the next column. (Enter 0 if there's no carry!)",
-                divInstrQuotient: (value, divisor) => `Bring down the digit: current value is <strong>${value}</strong>. How many whole times does ${divisor} fit into ${value}? Enter the digit above.`,
-                divInstrRemainder: (value, divisor, q, product) => `Multiply and subtract: <strong>${divisor} × ${q} = ${product}</strong>, so <strong>${value} − ${product} = ${value - product}</strong>. Enter the remainder below.`,
+                divInstrQuotient: (value, divisor) => `The number to divide now is <strong>${value}</strong>. How many whole times does ${divisor} fit into ${value}? Enter the digit above.`,
+                divInstrSubtrahend: (divisor, q, value) => `Now multiply: <strong>${divisor} × ${q}</strong>. Write the result below the line, under <strong>${value}</strong>.`,
+                divInstrDifference: (value, product) => `Now subtract: <strong>${value} − ${product}</strong>. Write the result below.`,
                 problemSolvedAdd: (n1, n2, ans) => `Fantastic! ${n1} + ${n2} = ${ans}. Problem solved!`,
                 problemSolvedSub: (n1, n2, ans) => `Fantastic! ${n1} − ${n2} = ${ans}. Problem solved!`,
                 problemSolvedMul: (n1, n2, ans) => `Fantastic! ${n1} × ${n2} = ${ans}. Problem solved!`,
@@ -725,12 +739,14 @@
                 correctCarry: 'Poprawne przeniesienie!',
                 correctBorrow: 'Poprawna pożyczka!',
                 correctQuotient: 'Poprawna cyfra ilorazu!',
-                correctRemainder: 'Poprawna reszta!',
+                correctSubtrahendDigit: 'Poprawnie!',
+                correctDifferenceDigit: 'Poprawnie!',
                 incorrectDigitTry: 'Niestety, spróbuj ponownie w tej kolumnie.',
                 incorrectCarry: 'Niepoprawne przeniesienie. Sprawdź cyfrę dziesiątek w sumie tej kolumny!',
                 incorrectBorrow: 'Niepoprawna pożyczka. Czy trzeba było pożyczyć z następnej kolumny? (0 lub 1)',
                 incorrectQuotient: 'Niepoprawna cyfra ilorazu. Ile pełnych razy dzielnik mieści się w tej liczbie?',
-                incorrectRemainder: 'Niepoprawna reszta. Odejmij (dzielnik × cyfra ilorazu) od bieżącej wartości.',
+                incorrectSubtrahendDigit: 'Niezupełnie — sprawdź mnożenie (dzielnik × cyfra ilorazu).',
+                incorrectDifferenceDigit: 'Niezupełnie — sprawdź odejmowanie.',
                 remainderLabel: 'Reszta:',
                 clickNext: "Kliknij 'Następna runda', aby kontynuować!",
                 addInstrAnswer: (d1, d2, cin, sum) => cin > 0
@@ -748,8 +764,9 @@
                     ? `Pomnóż i dodaj przeniesienie: <strong>${d1} × ${d2} + ${cin} (przeniesienie) = ${prod}</strong>.<br>Wpisz cyfrę jedności poniżej.`
                     : `Pomnóż cyfrę kolumny: <strong>${d1} × ${d2} = ${prod}</strong>.<br>Wpisz cyfrę jedności poniżej.`,
                 mulInstrCarry: 'Świetnie! Jaka jest cyfra przeniesienia do następnej kolumny? Wpisz ją nad następną kolumną. (Wpisz 0, jeśli nie ma przeniesienia!)',
-                divInstrQuotient: (value, divisor) => `Znieś cyfrę: bieżąca wartość to <strong>${value}</strong>. Ile pełnych razy ${divisor} mieści się w ${value}? Wpisz cyfrę powyżej.`,
-                divInstrRemainder: (value, divisor, q, product) => `Pomnóż i odejmij: <strong>${divisor} × ${q} = ${product}</strong>, więc <strong>${value} − ${product} = ${value - product}</strong>. Wpisz resztę poniżej.`,
+                divInstrQuotient: (value, divisor) => `Liczba do podzielenia to teraz <strong>${value}</strong>. Ile pełnych razy ${divisor} mieści się w ${value}? Wpisz cyfrę powyżej.`,
+                divInstrSubtrahend: (divisor, q, value) => `Teraz pomnóż: <strong>${divisor} × ${q}</strong>. Wpisz wynik poniżej linii, pod <strong>${value}</strong>.`,
+                divInstrDifference: (value, product) => `Teraz odejmij: <strong>${value} − ${product}</strong>. Wpisz wynik poniżej.`,
                 problemSolvedAdd: (n1, n2, ans) => `Wspaniale! ${n1} + ${n2} = ${ans}. Zadanie rozwiązane!`,
                 problemSolvedSub: (n1, n2, ans) => `Wspaniale! ${n1} − ${n2} = ${ans}. Zadanie rozwiązane!`,
                 problemSolvedMul: (n1, n2, ans) => `Wspaniale! ${n1} × ${n2} = ${ans}. Zadanie rozwiązane!`,
@@ -1008,10 +1025,19 @@
         function genDivision(tier) {
             const dividend = genNumber(tier);
             const divisor = randInt(2, 9);
+            const digits = dividend.toString().split('').map(Number);
+            const n = digits.length;
+            let value = 0;
+            let startPos = n - 1;
+            for (let k = 0; k < n; k++) {
+                value = value * 10 + digits[k];
+                if (value >= divisor) { startPos = k; break; }
+            }
+            const runningRemainder = Math.floor(value / 10);
             return {
-                type: 'division', dividend, divisor,
-                digits: dividend.toString().split('').map(Number),
-                pos: 0, stepState: 'QUOTIENT', quotientDigits: [], runningRemainder: 0
+                type: 'division', dividend, divisor, digits, n, startPos,
+                pos: startPos, stepState: 'QUOTIENT', quotientDigits: {}, runningRemainder,
+                rows: [], activeRow: null
             };
         }
 
@@ -1401,147 +1427,266 @@
 
         /* ---------- Division engine ---------- */
 
-        function buildDivisionGrid(grid) {
-            const p = problem;
+        function currentChunkValue(p) { return p.runningRemainder * 10 + p.digits[p.pos]; }
 
-            const qRow = document.createElement('div');
-            qRow.className = 'quotient-row';
-            const spacer = document.createElement('span');
-            spacer.className = 'div-spacer';
-            qRow.appendChild(spacer);
-            p.digits.forEach((d, i) => {
-                const input = document.createElement('input');
-                input.type = 'text'; input.maxLength = 1; input.className = 'q-input';
-                input.id = `q-${i}`; input.disabled = true;
-                input.addEventListener('input', e => handleDivisionInput(e, 'QUOTIENT', i));
-                qRow.appendChild(input);
-            });
-            grid.appendChild(qRow);
-
-            const mainRow = document.createElement('div');
-            mainRow.className = 'division-main';
-            const divisorSpan = document.createElement('span');
-            divisorSpan.className = 'divisor';
-            divisorSpan.innerText = p.divisor;
-            mainRow.appendChild(divisorSpan);
-            const bracket = document.createElement('span');
-            bracket.className = 'bracket';
-            p.digits.forEach((d, i) => {
-                const dSpan = document.createElement('span');
-                dSpan.className = 'dividend-digit';
-                dSpan.id = `dd-${i}`;
-                dSpan.innerText = d;
-                bracket.appendChild(dSpan);
-            });
-            mainRow.appendChild(bracket);
-            grid.appendChild(mainRow);
-
-            const remBox = document.createElement('div');
-            remBox.className = 'remainder-box hidden';
-            remBox.id = 'remainder-box';
-            const remLabel = document.createElement('label');
-            remLabel.id = 'remainder-label';
-            remLabel.innerText = t('remainderLabel');
-            const remInput = document.createElement('input');
-            remInput.type = 'text'; remInput.maxLength = 1; remInput.className = 'answer-input';
-            remInput.id = 'remainder-input'; remInput.disabled = true;
-            remInput.addEventListener('input', e => handleDivisionInput(e, 'REMAINDER'));
-            remBox.appendChild(remLabel); remBox.appendChild(remInput);
-            grid.appendChild(remBox);
+        function divCycleColor(p, pos) {
+            return ((pos - p.startPos) % 2 === 0) ? 'div-color-a' : 'div-color-b';
         }
 
-        function currentDivisionValue(p) { return p.runningRemainder * 10 + p.digits[p.pos]; }
+        function setupDivisionActiveRow(p) {
+            if (p.stepState === 'SUBTRAHEND') {
+                const product = p.quotientDigits[p.pos] * p.divisor;
+                const str = String(product);
+                p.activeRow = { type: 'product', startCol: p.pos - str.length + 1, expected: str, entered: new Array(str.length).fill(null) };
+            } else if (p.stepState === 'DIFFERENCE') {
+                const chunk = currentChunkValue(p);
+                const product = p.quotientDigits[p.pos] * p.divisor;
+                const diff = chunk - product;
+                const str = String(diff);
+                p.activeRow = { type: 'difference', startCol: p.pos - str.length + 1, expected: str, entered: new Array(str.length).fill(null) };
+            } else {
+                p.activeRow = null;
+            }
+        }
+
+        function totalDivCols(p) { return p.n + 2; }
+
+        function appendDivGutter(grid) {
+            const g = document.createElement('div');
+            g.className = 'div-cell';
+            grid.appendChild(g);
+        }
+
+        function buildDivisionGrid(grid) {
+            const p = problem;
+            setupDivisionActiveRow(p);
+            renderDivisionBoard(grid);
+        }
+
+        function renderDivisionBoard(gridArg) {
+            const p = problem;
+            const grid = gridArg || document.getElementById('math-grid');
+            grid.className = 'division-grid';
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${totalDivCols(p)}, 40px)`;
+
+            appendDivGutter(grid);
+            for (let col = 0; col < p.n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'div-cell';
+                if (col < p.startPos) {
+                    const box = document.createElement('div');
+                    box.className = 'div-box div-box-static';
+                    cell.appendChild(box);
+                } else if (p.quotientDigits[col] !== undefined) {
+                    const box = document.createElement('div');
+                    box.className = `div-box div-box-filled ${divCycleColor(p, col)}`;
+                    box.textContent = p.quotientDigits[col];
+                    cell.appendChild(box);
+                } else if (p.stepState === 'QUOTIENT' && col === p.pos) {
+                    const input = document.createElement('input');
+                    input.type = 'text'; input.maxLength = 1; input.className = 'div-input';
+                    input.addEventListener('input', handleDivisionQuotientInput);
+                    cell.appendChild(input);
+                }
+                grid.appendChild(cell);
+            }
+            appendDivGutter(grid);
+
+            const line = document.createElement('div');
+            line.className = 'div-line-row';
+            grid.appendChild(line);
+
+            appendDivGutter(grid);
+            for (let col = 0; col < p.n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'div-cell';
+                cell.textContent = p.digits[col];
+                grid.appendChild(cell);
+            }
+            const divisorCell = document.createElement('div');
+            divisorCell.className = 'div-cell div-divisor-label';
+            divisorCell.textContent = `: ${p.divisor}`;
+            grid.appendChild(divisorCell);
+
+            p.rows.forEach(row => renderCommittedDivRow(grid, p, row));
+
+            if (p.activeRow) renderActiveDivRow(grid, p);
+
+            const focusEl = grid.querySelector('.div-input:not(:disabled)');
+            if (focusEl) focusEl.focus();
+        }
+
+        function renderCommittedDivRow(grid, p, row) {
+            const gutter = document.createElement('div');
+            gutter.className = 'div-cell';
+            if (row.type === 'product') {
+                const sign = document.createElement('span');
+                sign.className = `div-minus-sign ${row.color}`;
+                sign.textContent = '−';
+                gutter.appendChild(sign);
+            }
+            grid.appendChild(gutter);
+
+            for (let col = 0; col < p.n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'div-cell';
+                if (col >= row.startCol && col <= row.endCol) {
+                    const box = document.createElement('div');
+                    box.className = `div-box div-box-filled ${row.type === 'product' ? row.color : ''}`;
+                    box.textContent = row.digits[col - row.startCol];
+                    cell.appendChild(box);
+                } else if (row.extraDigit && col === row.extraDigit.col) {
+                    const box = document.createElement('div');
+                    box.className = 'div-box div-box-filled';
+                    box.textContent = row.extraDigit.value;
+                    cell.appendChild(box);
+                }
+                grid.appendChild(cell);
+            }
+            appendDivGutter(grid);
+        }
+
+        function renderActiveDivRow(grid, p) {
+            const row = p.activeRow;
+            const color = row.type === 'product' ? divCycleColor(p, p.pos) : null;
+            const nextIndex = row.entered.findIndex(v => v === null);
+
+            const gutter = document.createElement('div');
+            gutter.className = 'div-cell';
+            if (row.type === 'product') {
+                const sign = document.createElement('span');
+                sign.className = `div-minus-sign ${color}`;
+                sign.textContent = '−';
+                gutter.appendChild(sign);
+            }
+            grid.appendChild(gutter);
+
+            for (let col = 0; col < p.n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'div-cell';
+                const idx = col - row.startCol;
+                if (idx >= 0 && idx < row.expected.length) {
+                    if (row.entered[idx] !== null) {
+                        const box = document.createElement('div');
+                        box.className = `div-box div-box-filled ${color || ''}`;
+                        box.textContent = row.entered[idx];
+                        cell.appendChild(box);
+                    } else if (idx === nextIndex) {
+                        const input = document.createElement('input');
+                        input.type = 'text'; input.maxLength = 1; input.className = 'div-input';
+                        input.addEventListener('input', e => handleDivisionBoxInput(e, idx));
+                        cell.appendChild(input);
+                    } else {
+                        const box = document.createElement('div');
+                        box.className = 'div-box div-box-static';
+                        cell.appendChild(box);
+                    }
+                }
+                grid.appendChild(cell);
+            }
+            appendDivGutter(grid);
+        }
 
         function updateDivisionHighlights() {
-            const p = problem;
-            document.querySelectorAll('.q-input').forEach(el => { el.disabled = true; el.classList.remove('active-q'); });
-            const remInput = document.getElementById('remainder-input');
-            const remBox = document.getElementById('remainder-box');
-            remInput.disabled = true;
-            remBox.classList.add('hidden');
-            document.querySelectorAll('.dividend-digit').forEach(el => el.classList.remove('active-column'));
-
-            const activeDigit = document.getElementById(`dd-${p.pos}`);
-            if (activeDigit) activeDigit.classList.add('active-column');
-
-            if (p.stepState === 'QUOTIENT') {
-                const qEl = document.getElementById(`q-${p.pos}`);
-                if (qEl) { qEl.disabled = false; qEl.classList.add('active-q'); qEl.focus(); }
-            } else {
-                remBox.classList.remove('hidden');
-                document.getElementById('remainder-label').innerText = t('remainderLabel');
-                remInput.disabled = false;
-                remInput.value = '';
-                remInput.focus();
-            }
+            renderDivisionBoard();
         }
 
         function divisionInstructionHTML() {
             const p = problem;
-            const value = currentDivisionValue(p);
+            const value = currentChunkValue(p);
             if (p.stepState === 'QUOTIENT') {
                 return t('divInstrQuotient', value, p.divisor);
             }
             const q = p.quotientDigits[p.pos];
+            if (p.stepState === 'SUBTRAHEND') {
+                return t('divInstrSubtrahend', p.divisor, q, value);
+            }
             const product = p.divisor * q;
-            return t('divInstrRemainder', value, p.divisor, q, product);
+            return t('divInstrDifference', value, product);
         }
 
-        function handleDivisionInput(event, stepType) {
+        function handleDivisionQuotientInput(event) {
+            const p = problem;
             const val = event.target.value;
             if (!/^\d$/.test(val)) { event.target.value = ''; return; }
             const digitInput = parseInt(val, 10);
-            const p = problem;
+            const expected = Math.floor(currentChunkValue(p) / p.divisor);
             const feedback = document.getElementById('feedback-message');
-            const value = currentDivisionValue(p);
+            if (digitInput === expected) {
+                registerCorrect('division');
+                feedback.className = 'feedback correct';
+                feedback.innerText = t('correctQuotient');
+                p.quotientDigits[p.pos] = digitInput;
+                p.stepState = 'SUBTRAHEND';
+                setupDivisionActiveRow(p);
+                updateHighlights(); updateInstruction();
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerText = t('incorrectQuotient');
+                event.target.value = '';
+            }
+        }
 
-            if (stepType === 'QUOTIENT') {
-                const expected = Math.floor(value / p.divisor);
-                if (digitInput === expected) {
-                    registerCorrect('division');
-                    feedback.className = 'feedback correct';
-                    feedback.innerText = t('correctQuotient');
-                    p.quotientDigits[p.pos] = digitInput;
-                    const qEl = document.getElementById(`q-${p.pos}`);
-                    qEl.value = digitInput; qEl.disabled = true;
-                    p.stepState = 'REMAINDER';
-                    updateDivisionHighlights(); updateInstruction();
+        function handleDivisionBoxInput(event, idx) {
+            const p = problem;
+            const val = event.target.value;
+            if (!/^\d$/.test(val)) { event.target.value = ''; return; }
+            const digitInput = parseInt(val, 10);
+            const expectedDigit = parseInt(p.activeRow.expected[idx], 10);
+            const feedback = document.getElementById('feedback-message');
+            const isProduct = p.activeRow.type === 'product';
+            if (digitInput === expectedDigit) {
+                registerCorrect('division');
+                feedback.className = 'feedback correct';
+                feedback.innerText = isProduct ? t('correctSubtrahendDigit') : t('correctDifferenceDigit');
+                p.activeRow.entered[idx] = digitInput;
+                if (p.activeRow.entered.every(v => v !== null)) {
+                    commitActiveDivisionRow();
                 } else {
-                    feedback.className = 'feedback incorrect';
-                    feedback.innerText = t('incorrectQuotient');
-                    event.target.value = '';
+                    updateHighlights(); updateInstruction();
                 }
             } else {
-                const expected = value % p.divisor;
-                if (digitInput === expected) {
-                    registerCorrect('division');
-                    feedback.className = 'feedback correct';
-                    feedback.innerText = t('correctRemainder');
-                    p.runningRemainder = digitInput;
-                    if (p.pos >= p.digits.length - 1) {
-                        finishDivision();
-                    } else {
-                        p.pos++;
-                        p.stepState = 'QUOTIENT';
-                        updateDivisionHighlights(); updateInstruction();
-                    }
+                feedback.className = 'feedback incorrect';
+                feedback.innerText = isProduct ? t('incorrectSubtrahendDigit') : t('incorrectDifferenceDigit');
+                event.target.value = '';
+            }
+        }
+
+        function commitActiveDivisionRow() {
+            const p = problem;
+            const row = p.activeRow;
+            if (row.type === 'product') {
+                const color = divCycleColor(p, p.pos);
+                p.rows.push({ type: 'product', startCol: row.startCol, endCol: p.pos, digits: row.entered.slice(), color });
+                p.stepState = 'DIFFERENCE';
+                setupDivisionActiveRow(p);
+                updateHighlights(); updateInstruction();
+            } else {
+                const hasNext = p.pos < p.n - 1;
+                const extraDigit = hasNext ? { col: p.pos + 1, value: p.digits[p.pos + 1] } : null;
+                p.rows.push({ type: 'difference', startCol: row.startCol, endCol: p.pos, digits: row.entered.slice(), extraDigit });
+                p.runningRemainder = parseInt(row.expected, 10);
+                p.activeRow = null;
+                if (!hasNext) {
+                    finishDivision();
                 } else {
-                    feedback.className = 'feedback incorrect';
-                    feedback.innerText = t('incorrectRemainder');
-                    event.target.value = '';
+                    p.pos++;
+                    p.stepState = 'QUOTIENT';
+                    updateHighlights(); updateInstruction();
                 }
             }
         }
 
         function finishDivision() {
             const p = problem;
-            document.querySelectorAll('.q-input').forEach(el => el.disabled = true);
-            const remInput = document.getElementById('remainder-input');
-            if (remInput) remInput.disabled = true;
-            document.getElementById('remainder-box').classList.add('hidden');
+            p.stepState = 'DONE';
+            updateHighlights();
             document.getElementById('next-btn').classList.remove('hidden');
             document.getElementById('instruction-box').innerHTML = t('clickNext');
-            const quotient = parseInt(p.quotientDigits.join(''), 10);
+            let qStr = '';
+            for (let col = p.startPos; col < p.n; col++) qStr += p.quotientDigits[col];
+            const quotient = parseInt(qStr, 10);
             const remainder = p.runningRemainder;
             const feedback = document.getElementById('feedback-message');
             feedback.className = 'feedback correct';
@@ -1695,37 +1840,73 @@
             card.appendChild(mini);
         }
 
-        function buildExamDivisionCard(card, p, i) {
-            const board = document.createElement('div');
-            board.className = 'exam-division-board';
-
-            const mainRow = document.createElement('div');
-            mainRow.className = 'exam-division-row';
-            const divisorSpan = document.createElement('span');
-            divisorSpan.className = 'exam-divisor';
-            divisorSpan.innerText = p.num2;
-            mainRow.appendChild(divisorSpan);
-            const bracket = document.createElement('span');
-            bracket.className = 'exam-bracket';
-            p.num1.toString().split('').forEach(d => {
-                const s = document.createElement('span');
-                s.className = 'exam-dividend-digit';
-                s.innerText = d;
-                bracket.appendChild(s);
-            });
-            mainRow.appendChild(bracket);
-            board.appendChild(mainRow);
-
-            const qRow = document.createElement('div');
-            qRow.className = 'exam-quotient-row';
-            for (let k = 0; k < p.answerLen; k++) {
+        function addExamDivScratchRow(grid, scratchState) {
+            const cells = [];
+            for (let col = 0; col < scratchState.n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
                 const input = document.createElement('input');
-                input.type = 'text'; input.maxLength = 1; input.className = 'exam-input';
-                input.id = `exam-q-${i}-${k}`;
-                input.addEventListener('input', handleExamDigitInput);
-                qRow.appendChild(input);
+                input.type = 'text'; input.maxLength = 2; input.className = 'exam-scratch-input';
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                    if (cells === scratchState.lastCells && cells.some(c => c.value !== '')) {
+                        scratchState.lastCells = addExamDivScratchRow(grid, scratchState);
+                    }
+                });
+                cell.appendChild(input);
+                grid.appendChild(cell);
+                cells.push(input);
             }
-            board.appendChild(qRow);
+            grid.appendChild(document.createElement('div'));
+            return cells;
+        }
+
+        function buildExamDivisionCard(card, p, i) {
+            const digits = p.num1.toString().split('').map(Number);
+            const n = digits.length;
+            const startPos = n - p.answerLen;
+
+            const grid = document.createElement('div');
+            grid.className = 'exam-div-grid';
+            grid.style.gridTemplateColumns = `repeat(${n + 1}, 34px)`;
+
+            for (let col = 0; col < n; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
+                if (col < startPos) {
+                    const box = document.createElement('div');
+                    box.className = 'exam-div-box-static';
+                    cell.appendChild(box);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'text'; input.maxLength = 1; input.className = 'exam-input';
+                    input.id = `exam-q-${i}-${col - startPos}`;
+                    input.addEventListener('input', handleExamDigitInput);
+                    cell.appendChild(input);
+                }
+                grid.appendChild(cell);
+            }
+            grid.appendChild(document.createElement('div'));
+
+            const line = document.createElement('div');
+            line.className = 'exam-div-line';
+            grid.appendChild(line);
+
+            digits.forEach(d => {
+                const cell = document.createElement('div');
+                cell.className = 'exam-cell';
+                cell.textContent = d;
+                grid.appendChild(cell);
+            });
+            const divisorCell = document.createElement('div');
+            divisorCell.className = 'exam-cell exam-div-divisor-label';
+            divisorCell.textContent = `: ${p.num2}`;
+            grid.appendChild(divisorCell);
+
+            const scratchState = { n, lastCells: null };
+            scratchState.lastCells = addExamDivScratchRow(grid, scratchState);
+
+            card.appendChild(grid);
 
             const rRow = document.createElement('div');
             rRow.className = 'exam-remainder-row';
@@ -1738,9 +1919,7 @@
             rInput.addEventListener('input', handleExamDigitInput);
             rRow.appendChild(rLabel);
             rRow.appendChild(rInput);
-            board.appendChild(rRow);
-
-            card.appendChild(board);
+            card.appendChild(rRow);
         }
 
         function buildExamGrid() {
@@ -1831,7 +2010,6 @@
             grid.innerHTML = '';
             grid.style.gridTemplateColumns = '';
             if (problem.type === 'division') {
-                grid.className = 'division-board';
                 buildDivisionGrid(grid);
             } else if (problem.type === 'subtraction') {
                 grid.className = 'math-container';
